@@ -1,0 +1,114 @@
+!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<head>
+ <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+		 <!-- VersiÃÂ³n compilada y comprimida del CSS de Bootstrap -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+ 
+<!-- Tema opcional -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+ 
+<!-- VersiÃÂ³n compilada y comprimida del JavaScript de Bootstrap -->
+			<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+			
+		    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+		    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+  <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
+  <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>	
+  <style>
+body
+	{
+	background: url('/image_background/?id=fundo.png');
+	background-repeat: repeat;
+	background-size: 20% 20%;
+	}
+  
+  
+  </style>	  
+</head>
+<body role="document" th:inline="text">
+		<!-- Navbar -->
+		
+		<nav class="navbar navbar-inverse navbar-fixed-top" >
+		    <div class="container">
+		        <div class="navbar-header">
+		            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+		                <span class="sr-only">Toggle navigation</span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		            </button>
+		           
+		        </div>
+		        <div id="navbar"  class="navbar-collapse collapse">
+		             <ul class="nav navbar-nav navbar-left">
+		                <a class="navbar-brand" href="#" >Modificar posiçao GPS</a>
+		                <li th:classappend="${page == 'home' ? 'active' : ''}"><a href="#" th:href="@{/index}">Voltar ao Mapa</a></li>
+		                
+		          	</ul>
+		           	
+		          
+		            <ul class="nav navbar-nav navbar-right">
+		                <li th:if="${#authorization.expression('!isAuthenticated()')}"><a href="/signin" th:href="@{/signin}">Sign in</a></li>
+		                <li th:if="${#authorization.expression('isAuthenticated()')}"><a href="/logout" th:href="@{/logout}">Logout</a></li>
+		            </ul>
+		        </div>
+		        <!--/.nav-collapse -->
+		    </div>
+		</nav>
+		 <div class="container theme-showcase"  role="main">
+		 	
+		 		<div class="row" style="position : fixed; margin-top:50px;">
+			 		<div class="jumbotron">
+				 		<form id="editing_question_survey" action="#" th:action="@{'/mudar_position_gps'}" th:object="${mudar_position_gps}" method="post">
+					    	
+					       		<div class="col-sm-2"><label for="First_Name">Codigo Cliente:</label><input type="text"  th:field="*{id}" /></div>
+					       		<div class="col-sm-2"><label for="First_Name">Latitude:</label><input type="text"  th:field="*{latitude}" /></div>
+					       		<div class="col-sm-2"><label for="First_Name">Longitude:</label><input type="text"  th:field="*{longitude}" /></div>
+				        		<div class="col-sm-2"><label for="First_Name">Endereço:</label><input type="text"  th:field="*{ende}" /></div>
+					        <input type="submit" value="Atualizar" class="btn btn-lg btn-success"/> 
+					    </form>
+					    <a href="http://www.gps-coordinates.net/" target="_blank">Pega as Coordenadas nesse site!</a>
+					</div>
+				</div>
+		 		<div class="row" >
+		 			<div class="jumbotron">
+		 				<table class="table table-striped"style=" margin-top:260px;" >
+													<thead>
+														
+														<th>Codigo Cliente</th>
+														<th>Logradouro</th>
+													
+														<th>Cidade</th>
+														<th>CEP</th>
+														
+													</thead>
+														<tbody >
+														<div th:each="cliente,row1  : ${clientes}">
+															<tr>
+																<td >[[${cliente.codigocliente}]]</td>
+																
+																<td >[[${cliente.endereco}]]</td>
+																
+															
+																
+																<td >[[${cliente.cidade}]]</td>
+																
+																<td >[[${cliente.CEP}]]</td>
+																
+															</tr>
+														</div>	
+														
+														</tbody>
+												</table>
+		 			</div>
+		 		</div>
+		 </div>
+
+<script th:inline="javascript" type="text/javascript">
+	var clientes = [[${clientes}]];
+</script>
+</body>
+</html>

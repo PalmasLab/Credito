@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <title>Subiendo cuestionarios!</title>
+      <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  <script src="http://malsup.github.com/jquery.form.js"></script>
+  </head>
+  <body>
+	<h1>Form</h1>
+    <form id="addRespostas" action="#" th:action="@{/formteste}" th:object="${survey_question}" method="post">
+    	<p>Pergunta: <input type="text" th:field="*{pergunta}" /></p>
+        <p>Resposta0: <input type="text" th:field="*{rrespostas[0]}" /></p>
+        <p>Resposta1: <input type="text" th:field="*{rrespostas[1]}" /></p>
+        <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /><input type="Button" value="Add New Answer!" onclick="addrespostas()"/></p>
+    </form>
+    <script type="text/javascript">
+    var contadorRespostasAdicionadas = 1;
+    
+    var formCodeBefore= " 	<p>Pergunta: <input id=\"pergunta\" name=\"pergunta\" type=\"text\" th:field=\"*{pergunta}\" /></p><p>Resposta0: <input id=\"rrespostas0\" name=\"rrespostas[0]\" type=\"text\" th:field=\"*{rrespostas[0]}\" /></p><p>Resposta1: <input id=\"rrespostas1\" name=\"rrespostas[1]\"type=\"text\" th:field=\"*{rrespostas[1]}\" /></p>";
+    var formCodeFinalInputs= " <p><input type=\"submit\" value=\"Submit\" /> <input type=\"reset\" value=\"Reset\" /><input type=\"Button\" value=\"Add New Answer!\" onclick=\"addrespostas()\"/></p>";
+	    function addrespostas()
+	    {
+	  
+	    	contadorRespostasAdicionadas++;
+	    	var AddingMiddleCode ="<p>Resposta"+contadorRespostasAdicionadas+": <input id=\"rrespostas"+contadorRespostasAdicionadas+"\" name=\"rrespostas["+contadorRespostasAdicionadas+"]\" type=\"text\" th:field=\"*{rrespostas["+contadorRespostasAdicionadas+"]}\" /></p>";
+	    	
+	    	$('#addRespostas').html(formCodeBefore + AddingMiddleCode + formCodeFinalInputs);
+	    //	$('#addRespostas').append(AddingMiddleCode);
+	    	formCodeBefore = formCodeBefore + AddingMiddleCode;
+	    }
+    
+    </script>
+  </body>
+</html>

@@ -1,0 +1,58 @@
+
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Editing one question</title>
+     		  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+		 <!-- Versión compilada y comprimida del CSS de Bootstrap -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+ 
+<!-- Tema opcional -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+ 
+<!-- Versión compilada y comprimida del JavaScript de Bootstrap -->
+			<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+</head>
+<body th:inline="text">
+  <div class="container theme-showcase"  role="main">
+  	<div class="jumbotron">
+				<h2>Editing Question Survey: [[${id_survey}]]</h2>								
+			    <form id="editing_question_survey" action="#" th:action="@{'/setOneSurveyQuestion/'+${project.id}+'/'+${id_survey}}" th:object="${survey_done}" method="post">
+			    	<p>Pergunta: <input type="text" th:field="*{pergunta}" /></p>
+			       <div th:each="resposta,row1 : *{rrespostas}">
+			       		<input type="text"  th:field="*{rrespostas[__${row1.index}__]}" />
+		        	</div>	
+			        <p><input type="submit" value="Submit" class="btn btn-lg btn-success"/> <input type="reset" value="Reset" class="btn btn-lg btn-warning"/> <input type="Button" value="Delete!!" class="btn btn-lg btn-danger"    onclick="deleteOneEditedSurvey()"/></p>
+			    </form>
+			</div>			 
+  
+  </div>
+  <script th:inline="javascript" type="text/javascript">
+      var contadorRespostasAdicionadas = 1;
+    var project_id = [[${project.id}]];
+    var survey_id = [[${id_survey}]];
+    
+    var formCodeBefore= " 	<p>Pergunta: <input id=\"pergunta\" name=\"pergunta\" type=\"text\" th:field=\"*{pergunta}\" /></p><p>Resposta0: <input id=\"rrespostas0\" name=\"rrespostas[0]\" type=\"text\" th:field=\"*{rrespostas[0]}\" /></p><p>Resposta1: <input id=\"rrespostas1\" name=\"rrespostas[1]\"type=\"text\" th:field=\"*{rrespostas[1]}\" /></p>";
+    var formCodeFinalInputs= " <p><input type=\"submit\" value=\"Submit\" class=\"btn btn-lg btn-success\"/> <input type=\"reset\" value=\"Reset\" class=\"btn btn-lg btn-danger\"/><input type=\"Button\" value=\"Add New Answer!\" class=\"btn btn-lg btn-warning\"  onclick=\"addrespostas()\"/></p>";
+	    function addrespostas()
+	    {
+	  
+	    	contadorRespostasAdicionadas++;
+	    	var AddingMiddleCode ="<p>Resposta"+contadorRespostasAdicionadas+": <input id=\"rrespostas"+contadorRespostasAdicionadas+"\" name=\"rrespostas["+contadorRespostasAdicionadas+"]\" type=\"text\" th:field=\"*{rrespostas["+contadorRespostasAdicionadas+"]}\" /></p>";
+	    	
+	    	$('#addRespostas').html(formCodeBefore + AddingMiddleCode + formCodeFinalInputs);
+	    //	$('#addRespostas').append(AddingMiddleCode);
+	    	formCodeBefore = formCodeBefore + AddingMiddleCode;
+	    }
+	    function deleteOneEditedSurvey()
+	    {
+	     window.location="/deleteOneSurveyQuestion/"+project_id+"/"+survey_id;
+	     
+	    }
+    
+  
+  
+  
+  </script>
+</body>
+</html>

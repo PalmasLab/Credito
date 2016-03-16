@@ -1,0 +1,464 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>PalmasLab</title>
+  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js"></script>
+  <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
+  <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
+
+<style >
+html, body {
+width:100%;
+height:100%;
+margin:0;
+background: #2C3C43;
+font: sans-serif;
+}
+p.boton {
+    color: white;
+    margin: 5px;
+    cursor: pointer;
+    float: left;
+    margin: auto;
+    width:20%;
+    left: 50%;
+    text-align:center;
+  }
+
+ p.boton:hover {
+    background: gray;
+    color: #83C24A;
+  }
+  p.boton:focus
+  {
+  color:#83C24A;
+  }
+    p.projeto{
+      color: white;
+    margin: 5px;
+    cursor: pointer;
+    float: left;
+    margin: auto;
+  }
+  p.projeto:hover{
+  background: gray;
+  color: #83C24A;
+  }
+.container
+{
+	background: #34696f;
+    border: 2px solid rgba(33, 68, 72, 0.59);
+    position: absolute;
+	top:0;
+	left:0;
+	right:0;
+	bottom:0;
+    margin: auto;
+    width:95%;
+	height:90%;
+}
+.nome_cliente
+{
+color:#83C24A;
+width:50%;
+height:10%;
+float: left;
+}
+.logout
+{
+color:#83C24A;
+width:50%;
+height:10%;
+float: left;
+text-align: right;
+}
+.nome_mapa
+{
+	color:white;
+ 	float: left;
+  	width: 50%;
+  	height:3%;
+  	text-align:center;
+}
+#map_canvas
+{
+	float: left;
+    width:45%;
+    height:80%;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px; 
+    border:1px solid #666;
+    margin-left:5%;
+    margin-bottom:1em;
+    box-shadow: 0px 0px 10px #333;
+}
+.botones{
+    float: left;
+    width:50%;
+    height:3%;
+    margin: auto;
+    position: relative;
+    top:0;
+	left:0;
+	right:0;
+	bottom:100;
+}
+
+.map_interact{
+    float: left;
+    width:45%;
+    height:80%;
+}
+
+.active {
+	border-top:   solid 3px #83C24A;
+	border-right: solid 1px #83C24A;
+	border-left:  solid 1px #83C24A;
+	color:#83C24A;
+	-webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px; 
+    border:1px solid #83C24A;
+    margin-bottom:2px;
+    box-shadow: 0px 0px 10px #333;
+}
+.active_interact{
+	border-top:    solid 1px #83C24A;
+	border-right:  solid 1px #83C24A;
+	border-left:   solid 1px #83C24A;
+	
+	
+	width:90%;
+    height:100%;
+    overflow: auto;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px; 
+  	
+    margin-bottom:1em;
+    box-shadow: 0px 0px 10px #333;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="nome_cliente" th:text="${cliente.complete_name}">Aqui sera o Nome do Cliente</div>
+	<div class="logout" ><a th:href="logout">Logout</a></div>
+  <div class="nome_mapa" >Escolha um mapa</div>
+  <div class="botones">
+	  <p class="boton" id="boton_meus_mapas">Meus Mapas</p>
+	  <p class="boton" id="boton_filtros">Filtros</p>
+	  <p class="boton" id="boton_relatorio">Relatório</p>
+	  <p class="boton" id="boton_ajuda">Ajuda</p>
+  </div>
+  <div id="map_canvas"> </div>
+  <div class="map_interact"> 
+  	<div id=interact_meus_mapas></div>
+  	<div id=interact_filtros></div>
+  	<div id=interact_relatorios></div>
+  	<div id=interact_ajuda></div>
+  </div>
+  	
+</div>
+  <div class="nomeloggin_cliente" th:text="${cliente.logginname}" style="display:none;"></div>
+<script>
+
+var numeroPerguntas = 0;
+var actualProjectClearToUrl ;
+var actualClientClearToUrl;
+var project_id;
+$( "p.boton" ).click(function() {
+
+
+  if($( this ).text()=="Meus Mapas")
+  {
+	  $('#interact_filtros').hide();
+	  LoadProjectList();
+  }
+  
+  if($( this ).text()=="Filtros")
+  {}
+  
+  
+  if($( this ).text()=="Relatório")
+ {}
+  
+  if($( this ).text()=="Ajuda")
+  {}
+  
+  
+  $("p.boton").removeClass("active");
+  $(this).addClass("active"); 
+ 
+});
+
+$('#interact_meus_mapas').on("click", "p.projeto" ,function() {
+actualProjectClearToUrl = $(this).text().replace(/ /g,"_");
+project_id = $(this).attr('id');
+loadMapProject($(this).text().replace(/ /g,"_"));
+
+
+});	
+
+function loadMapProject(projectmap)
+{
+actualClientClearToUrl = $('.nomeloggin_cliente').text().replace(/ /g,"_");
+
+$('#interact_filtros').html('<form action=\"\" >');
+	$.getJSON('getproject/'+$('.nomeloggin_cliente').text().replace(/ /g,"_")+'/'+projectmap, function(value) {
+		
+		$.each(value.lista, function(i){
+		$('#interact_filtros').append('<h4 >'+(i+1)+"."+value.lista[i].pergunta +"</h4>");
+		numeroPerguntas = numeroPerguntas + 1;
+
+			$.each(value.lista[i].rrespostas  , function(j){
+			if(j == 0)
+			{
+				$('#interact_filtros').append('<input type=\"checkbox\" class=\"todos_checkbox\" name=\"'+i+'\" value=\"'+j+'\" checked>'+value.lista[i].rrespostas[j]+'<br>');
+			}
+			else{
+				$('#interact_filtros').append('<input type=\"checkbox\" class=\"resto_checkbox\" name=\"'+i+'\" value=\"'+j+'\" >'+value.lista[i].rrespostas[j]+'<br>');
+			}
+			});
+			
+		});
+	
+	});
+	$('#interact_filtros').append('<button onclick=\" FilterCount() \">Filtrar</button> </form>');
+	$(".map_interact").removeClass("active_interact");
+	$('#interact_filtros').addClass("active_interact");
+	$('#interact_meus_mapas').hide();
+	$('#interact_filtros').hide();
+	$('#interact_filtros').show();
+	$('#boton_filtros').click();
+	$('.nome_mapa').html(projectmap.replace(/_/g," "));
+}
+$('#interact_filtros').on("click", ".todos_checkbox" ,function() {
+	var namee = $(this).attr('name');
+	$("input[class='resto_checkbox'][name="+namee+"]").each(function(value){
+		$("input[class='resto_checkbox'][name="+namee+"]").prop("checked",false);
+	});
+	
+});	
+
+$('#interact_filtros').on("click", ".resto_checkbox" ,function() {
+	var namee = $(this).attr('name');
+	
+	$("input[class='todos_checkbox'][name="+namee+"]").each(function(value){
+		$("input[class='todos_checkbox'][name="+namee+"]").prop("checked",false);
+	});
+});
+
+
+
+function FilterCount(){
+ 
+ var anyBoxesChecked = [];
+ var contadorChecks  = 0;
+ for(var i=0;i<numeroPerguntas;i++)
+	{
+		anyBoxesChecked.push(false);
+	}
+    
+ $(' input[type="checkbox"]').each(function() {
+        if ($(this).is(":checked")) {
+	        var name = $(this).attr('name');
+	        anyBoxesChecked[name]=true;
+  		}
+    });
+    for( var i=0;i<numeroPerguntas;i++)
+	{
+		if(anyBoxesChecked[i] == true)
+			{
+				contadorChecks = contadorChecks + 1;
+			}
+	}
+	if(contadorChecks == numeroPerguntas)
+	{
+	//CREATE THE ANSWERS_ARRAY
+		var respostas = [];
+		
+		for( var i=0;i < numeroPerguntas; i++)
+		{
+			respostas.push("");
+		}
+
+		 $(' input[type="checkbox"]').each(function() {
+		        if ($(this).is(":checked")) {
+		        var name = $(this).attr('name');
+		        respostas[name]=respostas[name]+$(this).val()+'_';
+			 }
+	    });
+	    //CREADOR DE CAMPO DE URL
+	    var respostasurl = "";
+	    for( var i=0;i<respostas.length;i++)
+	    {
+	    	respostasurl = respostasurl + respostas[i] + "-";
+	    }
+	    var url_get_list_map = 'getlistmap/'+actualClientClearToUrl+'/'+project_id+'/'+respostasurl;
+	    var urlprova = 'getlistmap';
+	
+	   
+	      $.getJSON(url_get_list_map, function (data) {
+	      if(data == "")
+	      {
+	      alert("Não existem locales com as combinações de respostas escolhidas.");
+	      }
+	      else{
+       		LoadMapa(data);
+ 			}
+        	
+         });
+		
+	}
+	else
+	{
+	alert("Escolha alguma opção para cada Pergunta.");
+	}
+}
+
+function LoadProjectList()
+{
+
+		$('#interact_meus_mapas').html("<li > ");
+		$.getJSON('getListaMapas',function( value ) {
+				$('#interact_meus_mapas').append("<p class=\"projeto\" id=\""+value.id+"\">" +value.project_name+"</p>");
+				}); 
+		
+		$('#interact_meus_mapas').append("</li>");	
+		$('#interact_meus_mapas').addClass("active_interact");
+		$('#interact_meus_mapas').show();
+}
+
+//MAPA!!!!!!!
+function LoadMapa(value)
+{
+
+	var idInfoBoxAberto;
+	var infoBox = [];
+	
+	   function abrirInfoBox(id, marker) {
+	   
+			if (typeof(idInfoBoxAberto) == 'number' && typeof(infoBox[idInfoBoxAberto]) == 'object') {
+				infoBox[idInfoBoxAberto].close();
+			}
+			infoBox[id].open(map, marker);
+			idInfoBoxAberto = id;
+		}
+	initialize(value);
+   function initialize(value) {
+   
+        var mapCanvas = document.getElementById('map_canvas');
+        var mapOptions = {
+          center: new google.maps.LatLng(-3.7280,-38.5303),
+          zoom: 12,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+        
+        var map = new google.maps.Map(mapCanvas, mapOptions);
+    	var latlngbounds = new google.maps.LatLngBounds();
+    	var markers = [];
+    	var contador = 0;
+    	var MaxSize = value.length;
+    	
+		 $.each(value, function(i,e) {
+		 //TEXT BOX CUSTOMIZATION     
+		 
+		       
+            var BoxElements = "<h3  font-weight: bold; text-align:center;>"+e.nome_posto_saude + "</h3><br>" + "Resposta 1:"+e.lista_respostas[0] + "<br>" + "resposta 2:"+e.lista_respostas[1]+ "<br>" + "resposta 3:"+e.lista_respostas[2]+ "<br>" + "resposta 34:787878"+ "<br>";
+            var imagesElements = "";
+            
+//OBTAINING IMAGES_pATH_LIST:
+			var image_url = "get_images_path/"+e.id;
+			var imagesLoaded = false;	
+//BUILDING THE HIPERLINK			
+			var hiperLink =  "<a href=\"localpoint/?id="+e.id+"&pid="+e.project_id+"\">Mais Informação</a>" ;	
+			
+				$.getJSON(image_url,function(data1,innerData){
+				//onready
+				contador ++; 
+					for( var y=0; y<3;y++)
+					{
+						if(typeof data1[y] != "undefined")
+							{                                                                  
+								imagesElements += "<img class=\"picture\" src=\"/SMALLimage/?id="+data1[y]+"\" style=\"width: 40px; height: 40px;\"></img>";
+							//	imagesElements ="<h3  font-weight: bold; text-align:center;>ohla pepsicola</h3><br>";
+								imagesLoaded = true;
+								
+							}
+					}	
+			
+			
+			   marker = new google.maps.Marker({
+                map: map,
+                draggable: true,
+                position: new google.maps.LatLng(new Number(e.latitude), new Number(e.longitude)),
+                title: e.nome_posto_saude,
+                visible: true
+            }),
+            boxText = document.createElement("div"),
+            //these are the options for all infoboxes
+            myOptions = {
+                 content: boxText,
+                disableAutoPan: false,
+                maxWidth: 0,
+                pixelOffset: new google.maps.Size(-140, 0),
+                zIndex: null,
+                boxStyle: {
+                    background: "url('http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/examples/tipbox.gif') no-repeat",
+                    opacity: 0.75,
+                    width: "280px"
+                },
+                closeBoxMargin: "12px 4px 2px 2px",
+                closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
+                infoBoxClearance: new google.maps.Size(1, 1),
+                isHidden: false,
+                pane: "floatPane",
+                enableEventPropagation: false
+            };
+   			//define the text and style for all infoboxes
+            boxText.style.cssText = " border: 1px solid black; margin-top: 8px; background:#333; color:#FFF; font-family:Arial; font-size:12px; padding: 5px; border-radius:6px; -webkit-border-radius:6px; -moz-border-radius:6px;";
+            
+	
+			BoxElements = BoxElements + imagesElements + hiperLink;
+			
+			boxText.innerHTML = BoxElements;
+		    infoBox[new Number(e.id)] = new InfoBox(myOptions);
+        	
+			infoBox[new Number(e.id)].marker = marker;
+			
+			var ib = new InfoBox(myOptions);
+
+			google.maps.event.addListener(marker, "click", function (e) {
+			boxText.innerHTML = BoxElements + imagesElements;
+			  ib.open(map, this);  // change the map variable appropriately
+		
+			});
+			
+		markers.push(marker);
+		latlngbounds.extend(marker.position);
+		
+		if(contador == MaxSize)
+ 	{
+ 		var markerCluster = new MarkerClusterer(map, markers);
+		map.fitBounds(latlngbounds);
+	
+ 	}
+		
+		
+    });// CIERRA getJSON
+});//CIERRA EACH PRINCIPAL DE CADA PUNTO
+ 	
+      }
+     
+// google.maps.event.addDomListener(window, 'load', initialize);
+
+}
+
+
+</script>
+</body>
+</html>

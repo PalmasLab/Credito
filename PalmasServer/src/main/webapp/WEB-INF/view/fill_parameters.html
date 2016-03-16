@@ -1,0 +1,69 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <title>Parametros!</title>
+      		  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+		 <!-- Versión compilada y comprimida del CSS de Bootstrap -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+ 
+<!-- Tema opcional -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+ 
+<!-- Versión compilada y comprimida del JavaScript de Bootstrap -->
+			<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+  
+  </head>
+  <body th:inline="text">
+  <div class="container theme-showcase"  role="main">
+  <h1 >Filling up Parameters</h1  >
+  		<h1 th:text="${project.project_name}"></h1  >
+  			<div th:each="surv,row1  : ${parameters_done}">
+		  		 <div class="jumbotron">
+					<h2 >Questao [[${row1.index}]]</h2>
+		        	<p th:text="${surv.pergunta}">Onions</p>
+		        	<div th:each="resposta,row2 : ${parameters_done[row1.index].rrespostas}">
+		        		<p th:text="${resposta}">Onions</p>
+		        	</div>																																																						
+		        	<p><input type="Button" value="Edit this Question" class="btn btn-lg btn-warning"  th:onclick="'javascript:editSurvey(\''+${parameters_done[__${row1.index}__].id}+'\');'"/> <input type="Button" value="Delete this question!" class="btn btn-lg btn-danger" th:onclick="'javascript:deleteOneEditedSurvey(\''+${parameters_done[__${row1.index}__].id}+'\');'"/></p>
+		         </div>
+	      	</div> 
+     	
+ 			<div class="jumbotron">
+				<h2>Nova Pergunta pro Questionario</h2>								
+			    <form id="addRespostas" action="#" th:action="@{'/addParametersQuestion/'(id=${project.id})}" th:object="${parameter_question}" method="post">
+			    	<p>Pergunta: <input type="text" th:field="*{pergunta}" /></p>
+			        <p>Resposta0: <input type="text" th:field="*{rrespostas[0]}" /></p>
+			        <p>Resposta1: <input type="text" th:field="*{rrespostas[1]}" /></p>
+			        <p><input type="submit" value="Submit" class="btn btn-lg btn-success"/> <input type="reset" value="Reset" class="btn btn-lg btn-danger"/> <input type="Button" value="Add New Answer!" class="btn btn-lg btn-warning" onclick="addrespostas()"/></p>
+			    </form>
+			</div>			    
+		</div>
+    <script th:inline="javascript" type="text/javascript">
+    var contadorRespostasAdicionadas = 1;
+    var project_id = [[${project.id}]];
+    
+    var formCodeBefore= " 	<p>Pergunta: <input id=\"pergunta\" name=\"pergunta\" type=\"text\" th:field=\"*{pergunta}\" /></p><p>Resposta0: <input id=\"rrespostas0\" name=\"rrespostas[0]\" type=\"text\" th:field=\"*{rrespostas[0]}\" /></p><p>Resposta1: <input id=\"rrespostas1\" name=\"rrespostas[1]\"type=\"text\" th:field=\"*{rrespostas[1]}\" /></p>";
+    var formCodeFinalInputs= " <p><input type=\"submit\" value=\"Submit\" class=\"btn btn-lg btn-success\"/> <input type=\"reset\" value=\"Reset\" class=\"btn btn-lg btn-danger\"/><input type=\"Button\" value=\"Add New Answer!\" class=\"btn btn-lg btn-warning\"  onclick=\"addrespostas()\"/></p>";
+	    function addrespostas()
+	    {
+	  
+	    	contadorRespostasAdicionadas++;
+	    	var AddingMiddleCode ="<p>Resposta"+contadorRespostasAdicionadas+": <input id=\"rrespostas"+contadorRespostasAdicionadas+"\" name=\"rrespostas["+contadorRespostasAdicionadas+"]\" type=\"text\" th:field=\"*{rrespostas["+contadorRespostasAdicionadas+"]}\" /></p>";
+	    	
+	    	$('#addRespostas').html(formCodeBefore + AddingMiddleCode + formCodeFinalInputs);
+	    //	$('#addRespostas').append(AddingMiddleCode);
+	    	formCodeBefore = formCodeBefore + AddingMiddleCode;
+	    }
+    function editSurvey(id_survey)
+    {
+   
+    window.location="/EditOneParameterQuestion/"+project_id+"/"+id_survey;
+    }
+    function deleteOneEditedSurvey(id_survey)
+	    {
+	      window.location="/deleteOneParameterQuestion/"+project_id+"/"+id_survey;
+	    }
+    </script>
+  </body>
+</html>

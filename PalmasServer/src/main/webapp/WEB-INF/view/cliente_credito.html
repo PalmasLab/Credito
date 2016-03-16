@@ -1,0 +1,1058 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+  <head>
+		  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+		 <!-- VersiÃ³n compilada y comprimida del CSS de Bootstrap -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+ 
+<!-- Tema opcional -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+ <script src="/js/bootstrap-datepicker.js"></script>
+ <link href="/css/datepicker.css" rel="stylesheet">
+<!-- VersiÃ³n compilada y comprimida del JavaScript de Bootstrap -->
+			<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+			<meta charset="ISO-8859-1">
+		    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+		    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<style type="text/css">
+	.bg {
+ 
+  position: fixed;
+  width: 1140px;
+  height: 350px; /*same height as jumbotron */
+  
+  background-position:center top;
+  z-index: -1;
+}
+body
+	{
+	background: url('/img/fundo.png');
+	background-repeat: repeat;
+	background-size: 20% 15%;
+	}
+#title_jumbotron {
+  height: 250px;
+  color: white;
+  text-shadow: #444 0 1px 1px;
+  background:transparent;
+  background-size: 100% 100%;
+}
+#mapa
+{
+	float: left;
+    width:100%;
+    height:567px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px; 
+    border:1px solid #666;
+    margin-bottom:1em;
+    box-shadow: 0px 0px 10px #333;
+}
+#buscador
+	{
+		margin-top: -20px;
+		position:absolute;
+		float:center;
+		margin-left: 450px;
+		
+	}	
+	#buscador2
+	{
+		margin-top: -20px;
+		position:absolute;
+		float:center;
+		margin-left: 700px;
+	}
+.info{
+	font-size: 0.875em;
+}
+	
+</style>	 
+ <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+  <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
+  <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
+</head>
+  
+  <body role="document" th:inline="text">
+		<!-- Navbar -->
+		
+		<nav class="navbar navbar-inverse navbar-fixed-top" >
+		    <div class="container">
+		        <div class="navbar-header">
+		            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+		                <span class="sr-only">Toggle navigation</span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		            </button>
+		           
+		        </div>
+		        <div id="navbar"  class="navbar-collapse collapse">
+		             <ul class="nav navbar-nav navbar-left">
+		                <a class="navbar-brand" href="#" >Historico Cliente</a>
+		                <li th:classappend="${page == 'home' ? 'active' : ''}"><a href="#" th:href="@{/index}">Voltar ao Mapa</a></li>
+		                <li th:classappend="${page == 'home' ? 'active' : ''}"><a href="#" th:href="@{'/update_one_gps_form/'+${cliente.id}}">Modificar Posicao GPS</a></li>
+		                 <li id="buscador">
+			                <form class="navbar-form" role="search" name="search-form" action="#" th:action="@{'/procuraporid_cliente_credito'}" th:object="${seguimento_cliente}" method="post">>
+							        	<div class="input-group">
+								            <input type="text" class="form-control" th:field="*{novo_seguimento}" placeholder="Procura de Cliente por ID" id="query" name="query" value="">
+									           
+								            		<button type="submit" class="btn btn-success"><i class="glyphicon glyphicon-search"></i></button>
+								            	
+								        </div>
+						    </form>
+						</li>  
+						<li id="buscador2">
+						<form class="navbar-form" role="search" name="search-form"  th:target="_blank"  action="#" th:action="@{'/procuraporendereco'}" th:object="${Buscaendereco}" method="post">>
+							        	<div class="input-group">
+								            <input type="text" class="form-control" th:field="*{endereco}" placeholder="Escreva o nome da Rua" id="query" name="query" value="">
+									            
+								            		<button type="submit" class="btn btn-success"><i class="glyphicon glyphicon-search"></i></button>
+								            	
+								        </div>
+						    </form>
+						</li>   
+		          	</ul>
+		           	
+		          
+		            <ul class="nav navbar-nav navbar-right">
+		                <li th:if="${#authorization.expression('!isAuthenticated()')}"><a href="/signin" th:href="@{/signin}">Sign in</a></li>
+		                <li th:if="${#authorization.expression('isAuthenticated()')}"><a href="/logout" th:href="@{/logout}">Logout</a></li>
+		            </ul>
+		        </div>
+		        <!--/.nav-collapse -->
+		    </div>
+		</nav>
+		
+		 <div class="container theme-showcase"  role="main">
+		
+		      <!-- Main jumbotron for a primary marketing message or call to action -->
+		      <div class="bg" id="bgid">
+		      </div>
+			  <div class="jumbotron" id="title_jumbotron">
+			        <h1 th:text="${cliente.nome_cliente}" style='text-align:center; margin-top:60px;text-shadow: 2px 2px #000000; '>Nome do Cliente</h1>
+			        
+			  </div>
+			  <div class="page-header">
+			  	<h1>Dados Pessoais</h1>
+				  <div class="row">
+									
+									<div class="col-md-6">
+										<div class="jumbotron">
+											
+												<table class="table table-striped" >
+													<thead>
+														
+													</thead>
+														<tbody >
+															<tr>
+																<td><b> Codigo Cliente:</b></td>
+																<td th:text="${cliente.codigocliente}"">Valor Vazío</td>
+																
+															</tr>
+															<tr>
+																<td><b> Nome Cliente:</b></td>
+																<td th:text="${cliente.nome_cliente}"">Valor Vazío</td>
+																
+															</tr>
+															<tr>
+																<td><b> Data de Nascimento:</b></td>
+																<td th:text="${cliente.nascimento}"">Valor Vazío</td>
+																
+															</tr>
+															<tr>
+																<td><b> Sexo:</b></td>
+																<td th:text="${cliente.sexo}"">Valor Vazío</td>
+																
+															</tr>
+															<tr>
+																<td><b> Escolaridade:</b></td>
+																<td th:text="${cliente.escolaridade}"">Valor Vazío</td>
+																
+															</tr>
+															<tr>
+																<td><b> Endereco:</b></td>
+																<td th:text="${cliente.endereco}">Valor Vazío </td>
+																
+															</tr>
+															<tr>
+																<td><b> CEP:</b></td>
+																<td th:text="${cliente.CEP}"">Valor Vazío </td>
+																
+															</tr>
+															<tr>
+																<td><b> Fone:</b></td>
+																<td th:text="${cliente.fone}"">Valor Vazío </td>
+																
+															</tr>
+															<tr>
+																<td><b> Constituicao:</b></td>
+																<td th:if="${not #lists.isEmpty(cliente.constituicao)}"">[[${cliente.constituicao[0]}]] </td>
+																<td th:if="${#lists.isEmpty(cliente.constituicao)}"">Valor VazÃ­o</td>
+															</tr>
+															<tr>
+																<td><b> Renda Familiar:</b></td>
+																<td th:text="${cliente.renda_familiar}"">[[${cliente.renda_familiar[0]}]] </td>
+																
+															</tr>
+															<tr>
+																<td><b> Numero Pessoas:</b></td>
+																<td th:if="${not #lists.isEmpty(cliente.numero_pessoas)}"">[[${cliente.numero_pessoas[0]}]] </td>
+																<td th:if="${#lists.isEmpty(cliente.numero_pessoas)}"">Valor VazÃ­o</td>
+															</tr>
+														
+														</tbody>
+												</table>
+										</div>
+										
+									</div>
+									<div class="col-md-6">
+										
+										<div id="mapa"></div>
+										
+									</div>
+										
+								</div>
+					<h1>Contratos</h1>
+						<div th:each="contrat,row1  : ${cliente.contrato}">
+						 <div class="jumbotron" th:id="contrato_+${row1.index}">
+							<div class="row">
+								
+								<h4 > <b>   Numero de Contrato: [[${contrat}]] </b> </h4>
+									<div class="col-md-6">
+											<table class="table table-striped" >
+												<thead>
+													
+												</thead>
+													<tbody >
+														<tr>
+															<td><b> Liberacao:</b></td>
+															<td th:unless="${#lists.isEmpty(cliente.liberacao) or #lists.size(cliente.liberacao)-1<row1.index}">[[${cliente.liberacao[__${row1.index}__]}]]</td>
+															
+														</tr>
+														<tr>
+															<td><b> Situacao:</b></td>
+															<td th:unless="${#lists.isEmpty(cliente.situacao) or #lists.size(cliente.situacao)-1<row1.index}">[[${cliente.situacao[__${row1.index}__]}]]</td>
+															
+														</tr>
+														<tr>
+															<td><b> Risco:</b></td>
+															<td th:unless="${#lists.isEmpty(cliente.risco) or #lists.size(cliente.risco)-1<row1.index}">[[${cliente.risco[__${row1.index}__]}]]</td>
+															
+														</tr>
+																												<tr>
+															<td><b> Saldo Devedor:</b></td>
+															<td th:unless="${#lists.isEmpty(cliente.saldo_devedor) or #lists.size(cliente.saldo_devedor)-1<row1.index}">[[${cliente.saldo_devedor[__${row1.index}__]}]]</td>
+															
+														</tr>
+														<tr>
+															<td><b> Valor Financiado:</b></td>
+															<td th:unless="${#lists.isEmpty(cliente.valor_financiado) or #lists.size(cliente.valor_financiado)-1<row1.index}">[[${cliente.valor_financiado[__${row1.index}__]}]]</td>
+															
+														</tr>
+														<tr>
+															<td><b> Numero de Parcelas:</b></td>
+															<td th:unless="${#lists.isEmpty(cliente.numero_parcelas) or #lists.size(cliente.numero_parcelas)-1<row1.index}">[[${cliente.numero_parcelas[__${row1.index}__]}]]</td>
+															
+														</tr>
+														
+													</tbody>
+											</table>
+									</div>
+									<div class="col-md-6">
+									
+											<table class="table table-striped" >
+												<thead>
+													
+												</thead>
+													<tbody >
+														<tr>
+															<td><b> Renovacao:</b></td>
+															<td th:unless="${#lists.isEmpty(cliente.renovacao) or #lists.size(cliente.renovacao)-1<row1.index}">[[${cliente.renovacao[__${row1.index}__]}]]</td>
+															
+														</tr>
+														<tr>
+															<td><b> Filial:</b></td>
+															<td th:unless="${#lists.isEmpty(cliente.filial) or #lists.size(cliente.filial)-1<row1.index}">[[${cliente.filial[__${row1.index}__]}]]</td>
+															
+														</tr>
+														<tr>
+															<td><b> Atividade:</b></td>
+															<td th:unless="${#lists.isEmpty(cliente.atividade) or #lists.size(cliente.atividade)-1<row1.index}">[[${cliente.atividade[__${row1.index}__]}]]</td>
+															
+														</tr>
+																												<tr>
+															<td><b> Codigo de Atividade:</b></td>
+															<td th:unless="${#lists.isEmpty(cliente.codigo) or #lists.size(cliente.codigo)-1<row1.index}">[[${cliente.codigo[__${row1.index}__]}]]</td>
+															
+														</tr>
+														<tr>
+															<td><b> Descricao:</b></td>
+															<td th:unless="${#lists.isEmpty(cliente.descricao) or #lists.size(cliente.descricao)-1<row1.index}">[[${cliente.descricao[__${row1.index}__]}]]</td>
+															
+														</tr>
+														
+														
+													</tbody>
+											</table>
+									</div>
+								</div>
+									
+								
+										
+							</div>
+						</div>	
+						
+				</div>
+			
+			<div id='hola'>
+				
+			</div>
+				
+		</div>
+		
+		
+		
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script th:inline="javascript" type="text/javascript">
+    var cliente = [[${cliente}]];
+    var neg_pag = [[${neg_pag}]];
+    var neg_ligar = [[${neg_ligar}]];
+    var neg_visita = [[${neg_visita}]];
+    
+    var jumboHeight = $('.jumbotron').outerHeight();
+    bordear();
+    function bordear()
+    {
+    	
+    	for(var i = 0 ; i < cliente.contrato.length;i++)
+    	{
+    		if(cliente.situacao[i] == "LIQUIDADO")
+    		{
+    		document.getElementById("contrato_"+i).style.border = "solid green";
+    		}
+    		else if(cliente.situacao[i] == "ATIVO")
+    		{
+    		document.getElementById("contrato_"+i).style.border = "solid yellow";
+    		}
+    		else if(cliente.situacao[i] == "PERDA")
+    		{
+    		document.getElementById("contrato_"+i).style.border = "solid red";
+    		}
+    	}
+    }
+	function parallax()
+	{
+	    var scrolled = $(window).scrollTop();
+	    $('.bg').css('height', (jumboHeight-scrolled) + 'px');
+	}
+
+	$(window).scroll(function(e){
+	    parallax();
+	});
+    
+   ChangeBackgroungImageOfTab("title_jumbotron","img/capa.png");
+   	function ChangeBackgroungImageOfTab(tabName, imagePrefix)
+{
+    document.getElementById(tabName).style.backgroundImage = "url(/" + imagePrefix+")";
+}
+
+
+
+//MAPPPPPPPPPPPPPPPPPPPPPPP
+			var map;
+				var pinColor;
+			var isPerda = false;
+			var isAtivo = false;
+			var isLiquidado = false;
+			
+			for(var y = 0; y < cliente.situacao.length ; y++)
+			{
+				if(cliente.situacao[y] == "PERDA")
+				{
+					isPerda = true;
+					detetado = true;
+					
+				}
+			}	
+			
+				
+			if(!isPerda)
+			{
+				for(var y = 0; y < cliente.situacao.length ; y++)
+				{
+					if(cliente.situacao[y] == "ATIVO")
+					{
+						isAtivo = true;
+						detetado = true;
+						
+					}
+				}
+			}
+			if(!isPerda && !isAtivo)
+			{
+				isLiquidado = true;
+			}
+			
+			
+			if(isPerda)
+			{
+				pinColor = "FF0000";
+			}
+			else if(isAtivo)
+			{
+				pinColor = "F7FE2E";
+			}
+			else
+			{
+				pinColor = "00FF00";
+			}
+					
+			var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+						    new google.maps.Size(21, 34),
+						    new google.maps.Point(0,0),
+						    new google.maps.Point(10, 34));
+		function initialize() {
+		  var mapOptions = {
+		    zoom: 15,
+		    center: new google.maps.LatLng(new Number(cliente.latitude), new Number(cliente.longitude))
+		  };
+		  map = new google.maps.Map(document.getElementById('mapa'),
+		      mapOptions);
+		       var marker = new google.maps.Marker({
+      position:new google.maps.LatLng(new Number(cliente.latitude), new Number(cliente.longitude)),
+      map: map,
+      icon: pinImage,
+      title: 'Cliente'
+  });
+		}
+		
+		google.maps.event.addDomListener(window, 'load', initialize);
+		
+		carregarNegociacoes();
+function carregarVariaveisIniciais(i)
+{
+	var code_neg_pag = "";
+	code_neg_pag += '<div class=\"jumbotron\" style=\"background:#249EF6"> <h4>Nova Negociação de Pagamento:</h4>';
+	code_neg_pag += '<form class=\"form-horizontal\" action=\"/addneg_pag?idcliente='+cliente.id+'&idcontrato='+cliente.contrato[i]+'\" method=\"post\" modelAttribute=\"NegociacaoPagamento\">';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Valor Inicial</label><div class=\"col-sm-3\"><input type=\"text\" class=\"form-control input-sm\" id=\"valorinicial\" name=\"valorinicial\" value=\"'+cliente.saldo_devedor[i]+'\" readonly/></div>';
+	
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Numero de Parcelas</label><div class=\"col-sm-3\"><select class=\"form-control input-sm\" id=\"numeroparcelas\" name=\"numeroparcelas\" ><option value=\"0\">Nao negociado</option><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option><option value=\"4\">4</option><option value=\"5\">5</option><option value=\"6\">6</option><option value=\"7\">7</option><option value=\"8\">8</option><option value=\"9\">9</option><option value=\"10\">10</option><option value=\"11\">11</option><option value=\"12\">12</option><option value=\"Automatico\">Automatico</option></select></div>';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Valor/Parcela</label><div class=\"col-sm-3\"><input type=\"number\" class=\"form-control input-sm\" id=\"valor_por_parcela\" name=\"valor_por_parcela\" step=\"0.01\" onkeypress=\"validate(event)\"/></div>';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Periodicidade</label><div class=\"col-sm-3\"><select class=\"form-control input-sm\" id=\"periodicidade\" name=\"periodicidade\" ><option value=\"0\">Não</option><option value=\"cada 7 dias\">cada 7 dias</option><option value=\"cada 8 dias\">cada 8 dias</option><option value=\"cada 9 dias\">cada 9 dias</option><option value=\"cada 10 dias\">cada 10 dias</option><option value=\"cada 11 dias\">cada 11 dias</option><option value=\"cada 12 dias\">cada 12 dias</option><option value=\"cada 13 dias\">cada 13 dias</option><option value=\"cada 14 dias\">cada 14 dias</option><option value=\"cada 15 dias\">cada 15 dias</option><option value=\"cada 16 dias\">cada 16 dias</option><option value=\"cada 17 dias\">cada 17 dias</option><option value=\"cada 18 dias\">cada 18 dias</option><option value=\"cada 19 dias\">cada 19 dias</option><option value=\"cada 20 dias\">cada 20 dias</option><option value=\"cada 21 dias\">cada 21 dias</option><option value=\"cada 22 dias\">cada 22 dias</option><option value=\"cada 23 dias\">cada 23 dias</option><option value=\"cada 24 dias\">cada 24 dias</option><option value=\"cada 25 dias\">cada 25 dias</option><option value=\"cada 1 mes\">cada 1 mes</option></select></div>';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Data Inicial</label><div class=\"col-sm-3\"><input type=\"text\" class=\"span2\" value="" id=\"datainicio\" name=\"datainicio\"></div>';
+	code_neg_pag += '<input class=\"btn btn-lg btn-default btn-sm\" type=\"submit\" value=\"Salvar\"/></form></div>';
+	$('#neg_pagamento1').html(code_neg_pag);
+	iniciarData();
+	
+}		
+//LIGAR
+function carregarVariaveisIniciaisLigar(i)
+{
+	var code_neg_pag = "";
+	code_neg_pag += '<div class=\"jumbotron\" style=\"background:#FE9A2E"> <h4>Nova Tabela de Ligacao:</h4>';
+	code_neg_pag += '<form class=\"form-horizontal\" action=\"/addneg_ligar?idcliente='+cliente.id+'&idcontrato='+cliente.contrato[i]+'\" method=\"post\" modelAttribute=\"NegociacaoLigar\">';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Periodicidade</label><div class=\"col-sm-3\"><select class=\"form-control input-sm\" id=\"periodicidade_ligar\" name=\"periodicidade_ligar\" ><option value=\"0\">Não</option><option value=\"cada 7 dias\">cada 7 dias</option><option value=\"cada 8 dias\">cada 8 dias</option><option value=\"cada 9 dias\">cada 9 dias</option><option value=\"cada 10 dias\">cada 10 dias</option><option value=\"cada 11 dias\">cada 11 dias</option><option value=\"cada 12 dias\">cada 12 dias</option><option value=\"cada 13 dias\">cada 13 dias</option><option value=\"cada 14 dias\">cada 14 dias</option><option value=\"cada 15 dias\">cada 15 dias</option><option value=\"cada 16 dias\">cada 16 dias</option><option value=\"cada 17 dias\">cada 17 dias</option><option value=\"cada 18 dias\">cada 18 dias</option><option value=\"cada 19 dias\">cada 19 dias</option><option value=\"cada 20 dias\">cada 20 dias</option><option value=\"cada 21 dias\">cada 21 dias</option><option value=\"cada 22 dias\">cada 22 dias</option><option value=\"cada 23 dias\">cada 23 dias</option><option value=\"cada 24 dias\">cada 24 dias</option><option value=\"cada 25 dias\">cada 25 dias</option><option value=\"cada 1 mes\">cada 1 mes</option></select></div>';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Data Inicial</label><div class=\"col-sm-3\"><input type=\"text\" class=\"span2\" value="" id=\"datainicio_ligar\" name=\"datainicio_ligar\"></div>';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Numero de Alertas</label><div class=\"col-sm-3\"><select class=\"form-control input-sm\" id=\"numero_repeticoes_ligar\" name=\"numero_repeticoes_ligar\" ><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option><option value=\"4\">4</option><option value=\"5\">5</option><option value=\"6\">6</option><option value=\"7\">7</option><option value=\"8\">8</option><option value=\"9\">9</option><option value=\"10\">10</option><option value=\"11\">11</option><option value=\"12\">12</option><option value=\"Automatico\">Automatico</option></select></div>';
+	code_neg_pag += '<input class=\"btn btn-lg btn-default btn-sm\" type=\"submit\" value=\"Salvar\"/></form></div>';
+	$('#neg_ligar1').html(code_neg_pag);
+	iniciarDataLigar();
+	
+}		
+////VISITA
+function carregarVariaveisIniciaisVisita(i)
+{
+	var code_neg_pag = "";
+	code_neg_pag += '<div class=\"jumbotron\" style=\"background:#FA5858"> <h4>Nova Tabela de Visitas:</h4>';
+	code_neg_pag += '<form class=\"form-horizontal\" action=\"/addneg_visita?idcliente='+cliente.id+'&idcontrato='+cliente.contrato[i]+'\" method=\"post\" modelAttribute=\"NegociacaoVisita\">';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Periodicidade</label><div class=\"col-sm-3\"><select class=\"form-control input-sm\" id=\"periodicidade_visita\" name=\"periodicidade_visita\" ><option value=\"0\">Não</option><option value=\"cada 7 dias\">cada 7 dias</option><option value=\"cada 8 dias\">cada 8 dias</option><option value=\"cada 9 dias\">cada 9 dias</option><option value=\"cada 10 dias\">cada 10 dias</option><option value=\"cada 11 dias\">cada 11 dias</option><option value=\"cada 12 dias\">cada 12 dias</option><option value=\"cada 13 dias\">cada 13 dias</option><option value=\"cada 14 dias\">cada 14 dias</option><option value=\"cada 15 dias\">cada 15 dias</option><option value=\"cada 16 dias\">cada 16 dias</option><option value=\"cada 17 dias\">cada 17 dias</option><option value=\"cada 18 dias\">cada 18 dias</option><option value=\"cada 19 dias\">cada 19 dias</option><option value=\"cada 20 dias\">cada 20 dias</option><option value=\"cada 21 dias\">cada 21 dias</option><option value=\"cada 22 dias\">cada 22 dias</option><option value=\"cada 23 dias\">cada 23 dias</option><option value=\"cada 24 dias\">cada 24 dias</option><option value=\"cada 25 dias\">cada 25 dias</option><option value=\"cada 1 mes\">cada 1 mes</option></select></div>';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Data Inicial</label><div class=\"col-sm-3\"><input type=\"text\" class=\"span2\" value="" id=\"datainicio_visita\" name=\"datainicio_visita\"></div>';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Numero de Alertas</label><div class=\"col-sm-3\"><select class=\"form-control input-sm\" id=\"numero_repeticoes_visita\" name=\"numero_repeticoes_visita\" ><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option><option value=\"4\">4</option><option value=\"5\">5</option><option value=\"6\">6</option><option value=\"7\">7</option><option value=\"8\">8</option><option value=\"9\">9</option><option value=\"10\">10</option><option value=\"11\">11</option><option value=\"12\">12</option><option value=\"Automatico\">Automatico</option></select></div>';
+	code_neg_pag += '<input class=\"btn btn-lg btn-default btn-sm\" type=\"submit\" value=\"Salvar\"/></form></div>';
+	$('#neg_visita1').html(code_neg_pag);
+	iniciarDataVisita();
+	
+}	
+function validate(evt) {
+  var theEvent = evt || window.event;
+  var key = theEvent.keyCode || theEvent.which;
+  key = String.fromCharCode( key );
+  var regex = /[0-9]|\./;
+  if( !regex.test(key) ) {
+    theEvent.returnValue = false;
+    if(theEvent.preventDefault) theEvent.preventDefault();
+  }
+}
+
+function iniciarData()
+{
+ $('#datainicio').datepicker({
+				format: 'dd/mm/yyyy'
+			});
+	var nowTemp = new Date();
+	var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+	 
+	var checkin = $('#datainicio').datepicker({
+	  onRender: function(date) {
+	    return date.valueOf() < now.valueOf() ? 'disabled' : '';
+	  }
+	}).on('changeDate', function(ev) {
+	  
+	  checkin.hide();
+	}).data('datepicker');
+}
+function iniciarDataLigar()
+{
+ $('#datainicio_ligar').datepicker({
+				format: 'dd/mm/yyyy'
+			});
+	var nowTemp = new Date();
+	var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+	 
+	var checkin = $('#datainicio_ligar').datepicker({
+	  onRender: function(date) {
+	    return date.valueOf() < now.valueOf() ? 'disabled' : '';
+	  }
+	}).on('changeDate', function(ev) {
+	  
+	  checkin.hide();
+	}).data('datepicker');
+}
+function iniciarDataVisita()
+{
+ $('#datainicio_visita').datepicker({
+				format: 'dd/mm/yyyy'
+			});
+	var nowTemp = new Date();
+	var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+	 
+	var checkin = $('#datainicio_visita').datepicker({
+	  onRender: function(date) {
+	    return date.valueOf() < now.valueOf() ? 'disabled' : '';
+	  }
+	}).on('changeDate', function(ev) {
+	  
+	  checkin.hide();
+	}).data('datepicker');
+}
+function iniciarDataTabela(ide)
+{
+
+ $(ide).datepicker({
+				format: 'dd/mm/yyyy'
+			});
+	var nowTemp = new Date();
+	var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+	 
+	var checkin = $(ide).datepicker({
+	  onRender: function(date) {
+	    return date.valueOf() < now.valueOf() ? 'disabled' : '';
+	  }
+	}).on('changeDate', function(ev) {
+	  
+	  checkin.hide();
+	}).data('datepicker');
+}
+function carregarNegociacoes()
+{
+	//ANALIZAMOS SI HAY ALGUN CONTRATO EN PERDIDA
+	for( var i=0; i<cliente.contrato.length;i++)
+	{
+		if(cliente.situacao[i] == 'PERDA' || cliente.situacao[i] == 'ATIVO')
+		{
+			var idcontrato = "#contrato_"+i;
+			if(neg_pag != "" && neg_pag != null)
+			{
+				if(neg_pag.idcontrato == cliente.contrato[i])
+				{
+					$(idcontrato).append('<div id=\"neg_pagamento1\" >');
+			
+					carregarAntigaNegociacao(i);
+				}	
+			}
+			else
+			{
+				//ADICIONAMOS BOTON DE NUEVA NEGOCIACION DE PAGAMENTO
+				$(idcontrato).append('<div id=\"neg_pagamento1\" ><button type=\"button\" class=\"btn btn-primary btn-sm\" onclick=\"carregarVariaveisIniciais('+i+') \">Nova negociacao de Pagamento R<span class="glyphicon glyphicon-usd"></span></button> </div>');
+			}	
+			// BOTAO LIGAR!
+			if(neg_ligar != "" && neg_ligar != null)
+			{
+				if(neg_ligar.idcontrato == cliente.contrato[i])
+				{
+					$(idcontrato).append('<div id=\"neg_ligar1\" >');
+					
+					carregarAntigaNegociacaoLigar(i);
+					
+				}	
+			}
+			else
+			{
+				//ADICIONAMOS BOTON DE NUEVA NEGOCIACION DE PAGAMENTO
+				$(idcontrato).append('<div id=\"neg_ligar1\" ><button type=\"button\" class=\"btn btn-warning btn-sm\" onclick=\"carregarVariaveisIniciaisLigar('+i+') \">Nova Alerta de Ligacao <span class="glyphicon glyphicon-earphone"></span></button> </div>');
+			}
+				// BOTAO VISITA!
+			if(neg_visita != "" && neg_visita != null)
+			{
+				if(neg_visita.idcontrato == cliente.contrato[i])
+				{
+					$(idcontrato).append('<div id=\"neg_visita1\" >');
+					carregarAntigaNegociacaoVisita(i);
+				}	
+			}
+			else
+			{
+				//ADICIONAMOS BOTON DE NUEVA NEGOCIACION DE PAGAMENTO
+				$(idcontrato).append('<div id=\"neg_visita1\" ><button type=\"button\" class=\"btn btn-danger btn-sm\" onclick=\"carregarVariaveisIniciaisVisita('+i+') \">Nova Alerta de Visita <span class="glyphicon glyphicon-home"></span></button> </div>');
+			}
+		}
+	}
+}
+function carregarAntigaNegociacao(ide)
+{
+	var code_neg_pag = "";
+	code_neg_pag += '<div id=\"antiga_neg_pag\" class=\"jumbotron\" style=\"background:#249EF6"> <h4>Negociação de Pagamento</h4>';
+	code_neg_pag += '<form class=\"form-horizontal\" action=\"/editneg_pag?idcliente='+cliente.id+'&idcontrato='+cliente.contrato[ide]+'&idneg_pag='+neg_pag.id+'\" method=\"post\" modelAttribute=\"NegociacaoPagamento\">';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Valor Inicial</label><div class=\"col-sm-3\"><input type=\"text\" class=\"form-control input-sm\" id=\"valorinicial\" name=\"valorinicial\" value=\"'+neg_pag.valorinicial+'\" readonly/></div>';
+	
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Numero de Parcelas</label><div class=\"col-sm-3\"><select class=\"form-control input-sm\" id=\"numeroparcelas\" name=\"numeroparcelas\" value=\"'+neg_pag.numeroparcelas+'\"><option value=\"Automatico\">Automatico</option><option value=\"Não negociado\">Não negociado</option><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option><option value=\"4\">4</option><option value=\"5\">5</option><option value=\"6\">6</option><option value=\"7\">7</option><option value=\"8\">8</option><option value=\"9\">9</option><option value=\"10\">10</option><option value=\"11\">11</option><option value=\"12\">12</option></select></div>';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Valor/Parcela</label><div class=\"col-sm-3\"><input type=\"number\" class=\"form-control input-sm\" id=\"valor_por_parcela\" name=\"valor_por_parcela\" step=\"0.01\" onkeypress=\"validate(event)\" value=\"'+neg_pag.valor_por_parcela+'\"/></div>';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Periodicidade</label><div class=\"col-sm-3\"><select class=\"form-control input-sm\" id=\"periodicidade\" name=\"periodicidade\" value=\"'+neg_pag.periodicidade+'\"><option value=\"0\">Não</option><option value=\"cada 7 dias\">cada 7 dias</option><option value=\"cada 8 dias\">cada 8 dias</option><option value=\"cada 9 dias\">cada 9 dias</option><option value=\"cada 10 dias\">cada 10 dias</option><option value=\"cada 11 dias\">cada 11 dias</option><option value=\"cada 12 dias\">cada 12 dias</option><option value=\"cada 13 dias\">cada 13 dias</option><option value=\"cada 14 dias\">cada 14 dias</option><option value=\"cada 15 dias\">cada 15 dias</option><option value=\"cada 16 dias\">cada 16 dias</option><option value=\"cada 17 dias\">cada 17 dias</option><option value=\"cada 18 dias\">cada 18 dias</option><option value=\"cada 19 dias\">cada 19 dias</option><option value=\"cada 20 dias\">cada 20 dias</option><option value=\"cada 21 dias\">cada 21 dias</option><option value=\"cada 22 dias\">cada 22 dias</option><option value=\"cada 23 dias\">cada 23 dias</option><option value=\"cada 24 dias\">cada 24 dias</option><option value=\"cada 25 dias\">cada 25 dias</option><option value=\"cada 1 mes\">cada 1 mes</option></select></div>';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Data Inicial</label><div class=\"col-sm-3\"><input type=\"text\" class=\"form-control input-sm\" value=\"'+neg_pag.datainicio+'\" id=\"datainicio\" name=\"datainicio\"></div>';
+	code_neg_pag += '<input class=\"btn btn-lg btn-default btn-sm\" type=\"submit\" value=\"Editar\"/></form></div>';
+	$('#neg_pagamento1').html(code_neg_pag);
+	
+	//SELECTING NUMERO DE PARCELAS
+	
+	for( var a = 0; a<document.getElementById("numeroparcelas").options.length;a++)
+	{
+	
+		if(document.getElementById("numeroparcelas").options[a].text == neg_pag.numeroparcelas)
+		{
+			document.getElementById("numeroparcelas").options[a].selected =true;
+		}
+	}
+	
+	//SELECTING PERIODICIDADE
+	for( var a = 0; a<document.getElementById("periodicidade").options.length;a++)
+	{
+	
+		if(document.getElementById("periodicidade").options[a].text == neg_pag.periodicidade)
+		{
+			document.getElementById("periodicidade").options[a].selected =true;
+		}
+	}
+
+	
+	iniciarData();
+	
+	if(neg_pag.tabela_pagamento.length>0)
+	{
+		carregarTabelaPagamentos(ide);
+	}	
+}
+//LIGAR
+function carregarAntigaNegociacaoLigar(ide)
+{
+	var code_neg_pag = "";
+	code_neg_pag += '<div id=\"antiga_neg_ligar\" class=\"jumbotron\" style=\"background:#FE9A2E"> <h4>Alerta de Ligação</h4>';
+	code_neg_pag += '<form class=\"form-horizontal\" action=\"/editneg_ligar?idcliente='+cliente.id+'&idcontrato='+cliente.contrato[ide]+'&idneg_ligar='+neg_ligar.id+'\" method=\"post\" modelAttribute=\"NegociacaoLigar\">';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Periodicidade</label><div class=\"col-sm-3\"><select class=\"form-control input-sm\" id=\"periodicidade_ligar\" name=\"periodicidade_ligar\" value=\"'+neg_ligar.periodicidade+'\"><option value=\"0\">Não</option><option value=\"cada 7 dias\">cada 7 dias</option><option value=\"cada 8 dias\">cada 8 dias</option><option value=\"cada 9 dias\">cada 9 dias</option><option value=\"cada 10 dias\">cada 10 dias</option><option value=\"cada 11 dias\">cada 11 dias</option><option value=\"cada 12 dias\">cada 12 dias</option><option value=\"cada 13 dias\">cada 13 dias</option><option value=\"cada 14 dias\">cada 14 dias</option><option value=\"cada 15 dias\">cada 15 dias</option><option value=\"cada 16 dias\">cada 16 dias</option><option value=\"cada 17 dias\">cada 17 dias</option><option value=\"cada 18 dias\">cada 18 dias</option><option value=\"cada 19 dias\">cada 19 dias</option><option value=\"cada 20 dias\">cada 20 dias</option><option value=\"cada 21 dias\">cada 21 dias</option><option value=\"cada 22 dias\">cada 22 dias</option><option value=\"cada 23 dias\">cada 23 dias</option><option value=\"cada 24 dias\">cada 24 dias</option><option value=\"cada 25 dias\">cada 25 dias</option><option value=\"cada 1 mes\">cada 1 mes</option></select></div>';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Data Inicial</label><div class=\"col-sm-3\"><input type=\"text\" class=\"form-control input-sm\" value=\"'+neg_ligar.datainicio_ligar+'\" id=\"datainicio_ligar\" name=\"datainicio_ligar\"></div>';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Numero de Alertas</label><div class=\"col-sm-3\"><select class=\"form-control input-sm\" id=\"numero_repeticoes_ligar\" name=\"numero_repeticoes_ligar\" ><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option><option value=\"4\">4</option><option value=\"5\">5</option><option value=\"6\">6</option><option value=\"7\">7</option><option value=\"8\">8</option><option value=\"9\">9</option><option value=\"10\">10</option><option value=\"11\">11</option><option value=\"12\">12</option><option value=\"Automatico\">Automatico</option></select></div>';
+	code_neg_pag += '<input class=\"btn btn-lg btn-default btn-sm\" type=\"submit\" value=\"Editar\"/></form></div>';
+	$('#neg_ligar1').html(code_neg_pag);
+	
+	
+	
+	//SELECTING PERIODICIDADE
+	for( var a = 0; a<document.getElementById("periodicidade_ligar").options.length;a++)
+	{
+	
+		if(document.getElementById("periodicidade_ligar").options[a].text == neg_ligar.periodicidade_ligar)
+		{
+			document.getElementById("periodicidade_ligar").options[a].selected =true;
+		}
+	}
+	//SELECTING REPETICOES
+	//SELECTING PERIODICIDADE
+	for( var a = 0; a<document.getElementById("numero_repeticoes_ligar").options.length;a++)
+	{
+	
+		if(document.getElementById("numero_repeticoes_ligar").options[a].text == neg_ligar.numero_repeticoes_ligar)
+		{
+			document.getElementById("numero_repeticoes_ligar").options[a].selected = true;
+		}
+	}
+	
+	
+	iniciarDataLigar();
+	if(neg_ligar.tabela_ligar.length>0)
+	{
+		carregarTabelaLigar(ide);
+	}
+}
+//VISITA
+function carregarAntigaNegociacaoVisita(ide)
+{
+	var code_neg_pag = "";
+	code_neg_pag += '<div id=\"antiga_neg_visita\" class=\"jumbotron\" style=\"background:#FA5858"> <h4>Alerta de Visita</h4>';
+	code_neg_pag += '<form class=\"form-horizontal\" action=\"/editneg_visita?idcliente='+cliente.id+'&idcontrato='+cliente.contrato[ide]+'&idneg_visita='+neg_visita.id+'\" method=\"post\" modelAttribute=\"NegociacaoVisita\">';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Periodicidade</label><div class=\"col-sm-3\"><select class=\"form-control input-sm\" id=\"periodicidade_visita\" name=\"periodicidade_visita\" value=\"'+neg_visita.periodicidade+'\"><option value=\"0\">Não</option><option value=\"cada 7 dias\">cada 7 dias</option><option value=\"cada 8 dias\">cada 8 dias</option><option value=\"cada 9 dias\">cada 9 dias</option><option value=\"cada 10 dias\">cada 10 dias</option><option value=\"cada 11 dias\">cada 11 dias</option><option value=\"cada 12 dias\">cada 12 dias</option><option value=\"cada 13 dias\">cada 13 dias</option><option value=\"cada 14 dias\">cada 14 dias</option><option value=\"cada 15 dias\">cada 15 dias</option><option value=\"cada 16 dias\">cada 16 dias</option><option value=\"cada 17 dias\">cada 17 dias</option><option value=\"cada 18 dias\">cada 18 dias</option><option value=\"cada 19 dias\">cada 19 dias</option><option value=\"cada 20 dias\">cada 20 dias</option><option value=\"cada 21 dias\">cada 21 dias</option><option value=\"cada 22 dias\">cada 22 dias</option><option value=\"cada 23 dias\">cada 23 dias</option><option value=\"cada 24 dias\">cada 24 dias</option><option value=\"cada 25 dias\">cada 25 dias</option><option value=\"cada 1 mes\">cada 1 mes</option></select></div>';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Data Inicial</label><div class=\"col-sm-3\"><input type=\"text\" class=\"form-control input-sm\" value=\"'+neg_visita.datainicio_visita+'\" id=\"datainicio_visita\" name=\"datainicio_visita\"></div>';
+	code_neg_pag += '<label class=\"col-sm-3 control-label\">Numero de Alertas</label><div class=\"col-sm-3\"><select class=\"form-control input-sm\" id=\"numero_repeticoes_visita\" name=\"numero_repeticoes_visita\" ><option value=\"1\">1</option><option value=\"2\">2</option><option value=\"3\">3</option><option value=\"4\">4</option><option value=\"5\">5</option><option value=\"6\">6</option><option value=\"7\">7</option><option value=\"8\">8</option><option value=\"9\">9</option><option value=\"10\">10</option><option value=\"11\">11</option><option value=\"12\">12</option><option value=\"Automatico\">Automatico</option></select></div>';
+	code_neg_pag += '<input class=\"btn btn-lg btn-default btn-sm\" type=\"submit\" value=\"Editar\"/></form></div>';
+	$('#neg_visita1').html(code_neg_pag);
+	
+	
+	
+	//SELECTING PERIODICIDADE
+	for( var a = 0; a<document.getElementById("periodicidade_visita").options.length;a++)
+	{
+	
+		if(document.getElementById("periodicidade_visita").options[a].text == neg_visita.periodicidade)
+		{
+			document.getElementById("periodicidade_visita").options[a].selected =true;
+		}
+	}
+	//SELECTING REPETICOES
+	
+	for( var a = 0; a<document.getElementById("numero_repeticoes_visita").options.length;a++)
+	{
+		if(document.getElementById("numero_repeticoes_visita").options[a].text == neg_visita.numero_repeticoes_visita)
+		{
+			document.getElementById("numero_repeticoes_visita").options[a].selected = true;
+		}
+	}
+	
+	iniciarDataVisita();
+	if(neg_visita.tabela_visita.length>0)
+	{
+		carregarTabelaVisita(ide);
+	}
+}
+function carregarTabelaPagamentos(ide)
+{
+
+	var codigo_tabela =' <table class=\"table table-bordered\" style=\"background:#F2F2F2;margin-top: 20px;\">';
+	codigo_tabela += '<thead ><td  style=\"text-align:center;\"><b>Data</b></td><td  style=\"text-align:center;\"><b>Valor Parcela</b></td><td  style=\"text-align:center;\"><b>Valor Recebido</b></td><td  style=\"text-align:center;\"><b>Anotação</b></td><td  style=\"text-align:center;\"><b>Ações</b></td></thead><tbody >';
+	for( var i=0; i< neg_pag.tabela_pagamento.length;i++)
+	{
+		if(neg_pag.tabela_pagamento[i].checked == false)
+		{
+			var alerta_ativa ='';
+			if(neg_pag.tabela_pagamento[i].alerta_ativa == true)
+			{
+				alerta_ativa = 'class=\"danger\"';
+			}
+			
+			codigo_tabela += '<tr '+alerta_ativa+'><td class=\"col-sm-2\"><input type=\"text\" class=\"form-control input-sm\" value=\"'+neg_pag.tabela_pagamento[i].dataalerta+'\" id=\"dataalerta_'+i+'\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"><input type=\"number\" onkeypress=\"validate(event)\" class=\"form-control input-sm\" value=\"'+neg_pag.tabela_pagamento[i].valorparcela+'\" id=\"valorparcela_'+i+'\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"><input type=\"number\" onkeypress=\"validate(event)\" class=\"form-control input-sm\" value=\"'+neg_pag.tabela_pagamento[i].valorrecebido+'\" id=\"valorrecebido_'+i+'\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"><input type=\"text\" class=\"form-control input-sm\" value=\"'+neg_pag.tabela_pagamento[i].comentario+'\" id=\"comentario_'+i+'\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"> <button type=\"button\" class=\"btn btn-success btn-xs\" onclick=\"salvarNegociacaoParcela('+i+','+ide+') \">Ok <span class="glyphicon glyphicon-ok"></span></button>';
+			codigo_tabela += '<button type=\"button\" class=\"btn btn-warning btn-xs\" onclick=\"editarNegociacaoParcela('+i+','+ide+') \">Edit <span class="glyphicon glyphicon-pencil"></span></button>';
+			codigo_tabela += '<button type=\"button\" class=\"btn btn-danger btn-xs\" onclick=\"deleteNegociacaoParcela('+i+','+ide+') \">Del <span class="glyphicon glyphicon-remove"></span></button></td></tr>';
+			
+			
+		}
+		else
+		{
+			codigo_tabela += '<tr class=\"success\"><td class=\"col-sm-2\" id=\"dataalerta_'+i+'\">'+neg_pag.tabela_pagamento[i].dataalerta+' </td>';
+			codigo_tabela += '<td class=\"col-sm-2 control-label\" id=\"valorparcela_'+i+'\">'+neg_pag.tabela_pagamento[i].valorparcela+'</td>';
+			codigo_tabela += '<td class=\"col-sm-2 control-label\" id=\"valorrecebido_'+i+'\">'+neg_pag.tabela_pagamento[i].valorrecebido+'</td>';
+			codigo_tabela += '<td class=\"col-sm-2 control-label\" id=\"comentario_'+i+'\">'+neg_pag.tabela_pagamento[i].comentario+' </td>';
+			codigo_tabela += '<td class=\"col-sm-2 control-label\"><button type=\"button\" class=\"btn btn-warning btn-xs\" onclick=\"editarNegociacaoParcela('+i+','+ide+') \">Editar <span class="glyphicon glyphicon-pencil"></span></button>';
+			codigo_tabela += '<button type=\"button\" class=\"btn btn-danger btn-xs\" onclick=\"deleteNegociacaoParcela('+i+','+ide+') \">Deletar <span class="glyphicon glyphicon-remove"></span></button></td></tr>';
+		}
+	}
+	//NUEVA LINHA DE NEGOCIACAO!
+	codigo_tabela += '<tr style=\"visibility:collapse;\" id=\"adding_row\"><td class=\"col-sm-2\"><input type=\"text\" class=\"form-control input-sm\" value=\"\" id=\"dataalerta_add\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"><input type=\"number\" onkeypress=\"validate(event)\" class=\"form-control input-sm\" value=\"\" id=\"valorparcela_add\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"><input type=\"number\" onkeypress=\"validate(event)\" class=\"form-control input-sm\" value=\"\" id=\"valorrecebido_add\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"><input type=\"text\" class=\"form-control input-sm\" value=\"\" id=\"comentario_add\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"> <button type=\"button\" class=\"btn btn-info btn-xs\" onclick=\"salvandoNovaLinhaNegociacao('+ide+') \">Salvar Linha <span class="glyphicon glyphicon-plus"></span></button></td></tr>';
+	
+	
+	
+	codigo_tabela += '</tbody></table><button type=\"button\" class=\"btn btn-info btn-xs\" onclick=\"AddNegociacaoParcela() \">Adicionar Linha de Negociação <span class="glyphicon glyphicon-plus"></span></button>';
+	
+	//COLOCANDO SOMA FINAL DAS PARCELAS RECEBIDAS:
+	var contatotalrecebido = parseFloat(0);
+	for (var y=0; y<neg_pag.tabela_pagamento.length;y++)
+	{
+		if(neg_pag.tabela_pagamento[y].checked == true)
+		{
+			contatotalrecebido += parseFloat(neg_pag.tabela_pagamento[y].valorrecebido);
+		}
+	}
+	codigo_tabela += '<div  class=\"jumbotron\" style=\"background:#F2F2F2; margin-top:20px; "> <h4>Contagem</h4>';
+	codigo_tabela += '<label class=\"col-sm-6 control-label\">Valor Inicial da Dívida: </label><label class=\"col-sm-6 control-label\">'+neg_pag.valorinicial+'</label>';
+	codigo_tabela += '<label class=\"col-sm-6 control-label\">Valor Total Recebido: </label><label class=\"col-sm-6 control-label\">'+contatotalrecebido+'</label>';
+	var restatotal = neg_pag.valorinicial - contatotalrecebido;
+	codigo_tabela += '<hr width=\"100%\" size=\"10\" style=\"border-color:black; border-style:solid;\">';
+	codigo_tabela += '<label class=\"col-sm-6 control-label\">Valor Devedor (Plataforma): </label><label class=\"col-sm-6 control-label\">'+restatotal+'</label>';
+	codigo_tabela += '<label class=\"col-sm-6 control-label\">Valor Devedor (SIP): </label><label class=\"col-sm-3 control-label\">'+cliente.saldo_devedor[ide].replace(",",".")+'</label>';
+	
+	if(parseFloat(contatotalrecebido) == parseFloat(cliente.saldo_devedor[ide].replace(",",".")))
+	{
+		codigo_tabela += '<label class=\"col-sm-3 control-label\" style=\"color:green;\">Plataforma sincronizada<span class="glyphicon glyphicon-ok"></span> </label></div>';
+	}
+	else
+	{
+		codigo_tabela += '<label class=\"col-sm-3 control-label\" style=\"color:red; margin-bottom:20px;\">Plataforma Não Sincronizada! <span class="glyphicon glyphicon-remove"></span> </label></div>';
+	}
+	$('#antiga_neg_pag').append(codigo_tabela);
+	
+	for( var i=0; i< neg_pag.tabela_pagamento.length;i++)
+	{
+	if(neg_pag.tabela_pagamento[i].checked == false)
+		{
+			iniciarDataTabela("#dataalerta_"+i);
+		}
+	}			
+}
+//LIGAR
+function carregarTabelaLigar(ide)
+{
+	var codigo_tabela =' <table class=\"table table-bordered\" style=\"background:#F2F2F2;margin-top: 20px;\">';
+	codigo_tabela += '<thead ><td  style=\"text-align:center;\"><b>Data</b></td><td  style=\"text-align:center;\"><b>Anotação</b></td><td  style=\"text-align:center;\"><b>Ações</b></td></thead><tbody >';
+	for( var i=0; i< neg_ligar.tabela_ligar.length;i++)
+	{
+		if(neg_ligar.tabela_ligar[i].checked == false)
+		{
+			var alerta_ativa ='';
+			if(neg_ligar.tabela_ligar[i].alerta_ativa == true)
+			{
+				alerta_ativa = 'class=\"danger\"';
+			}
+			
+			codigo_tabela += '<tr '+alerta_ativa+'><td class=\"col-sm-2\"><input type=\"text\" class=\"form-control input-sm\" value=\"'+neg_ligar.tabela_ligar[i].dataalerta+'\" id=\"dataalerta_ligar'+i+'\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"><input type=\"text\" class=\"form-control input-sm\" value=\"'+neg_ligar.tabela_ligar[i].comentario+'\" id=\"comentario_ligar'+i+'\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"> <button type=\"button\" class=\"btn btn-success btn-xs\" onclick=\"salvarNegociacaoLigar('+i+','+ide+') \">Ok <span class="glyphicon glyphicon-ok"></span></button>';
+			codigo_tabela += '<button type=\"button\" class=\"btn btn-warning btn-xs\" onclick=\"editarNegociacaoLigar('+i+','+ide+') \">Edit <span class="glyphicon glyphicon-pencil"></span></button>';
+			codigo_tabela += '<button type=\"button\" class=\"btn btn-danger btn-xs\" onclick=\"deleteNegociacaoLigar('+i+','+ide+') \">Del <span class="glyphicon glyphicon-remove"></span></button></td></tr>';
+			
+			
+		}
+		else
+		{
+			codigo_tabela += '<tr class=\"success\"><td class=\"col-sm-2\" id=\"dataalerta_ligar'+i+'\">'+neg_ligar.tabela_ligar[i].dataalerta+' </td>';
+			codigo_tabela += '<td class=\"col-sm-2 control-label\" id=\"comentario_ligar'+i+'\">'+neg_ligar.tabela_ligar[i].comentario+' </td>';
+			codigo_tabela += '<td class=\"col-sm-2 control-label\"><button type=\"button\" class=\"btn btn-warning btn-xs\" onclick=\"editarNegociacaoLigar('+i+','+ide+') \">Editar <span class="glyphicon glyphicon-pencil"></span></button>';
+			codigo_tabela += '<button type=\"button\" class=\"btn btn-danger btn-xs\" onclick=\"deleteNegociacaoLigar('+i+','+ide+') \">Deletar <span class="glyphicon glyphicon-remove"></span></button></td></tr>';
+		}
+	}
+	//NUEVA LINHA DE NEGOCIACAO!
+	codigo_tabela += '<tr style=\"visibility:collapse;\" id=\"adding_row_ligar\"><td class=\"col-sm-2\"><input type=\"text\" class=\"form-control input-sm\" value=\"\" id=\"dataalerta_add_ligar\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"><input type=\"text\" class=\"form-control input-sm\" value=\"\" id=\"comentario_add_ligar\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"> <button type=\"button\" class=\"btn btn-info btn-xs\" onclick=\"salvandoNovaLinhaNegociacaoLigar('+ide+') \">Salvar Linha <span class="glyphicon glyphicon-plus"></span></button></td></tr>';
+	
+	
+	
+	codigo_tabela += '</tbody></table><button type=\"button\" class=\"btn btn-info btn-xs\" onclick=\"AddNegociacaoLigar() \">Adicionar Linha de Ligar <span class="glyphicon glyphicon-plus"></span></button>';
+	
+	$('#antiga_neg_ligar').append(codigo_tabela);
+	
+	for( var i=0; i< neg_ligar.tabela_ligar.length;i++)
+	{
+	if(neg_ligar.tabela_ligar[i].checked == false)
+		{
+			iniciarDataTabela("#dataalerta_ligar"+i);
+		}
+	}			
+}
+//VISITA
+function carregarTabelaVisita(ide)
+{
+	var codigo_tabela =' <table class=\"table table-bordered\" style=\"background:#F2F2F2;margin-top: 20px;\">';
+	codigo_tabela += '<thead ><td  style=\"text-align:center;\"><b>Data</b></td><td  style=\"text-align:center;\"><b>Anotação</b></td><td  style=\"text-align:center;\"><b>Ações</b></td></thead><tbody >';
+	for( var i=0; i< neg_visita.tabela_visita.length;i++)
+	{
+		if(neg_visita.tabela_visita[i].checked == false)
+		{
+			var alerta_ativa ='';
+			if(neg_visita.tabela_visita[i].alerta_ativa == true)
+			{
+				alerta_ativa = 'class=\"danger\"';
+			}
+			
+			codigo_tabela += '<tr '+alerta_ativa+'><td class=\"col-sm-2\"><input type=\"text\" class=\"form-control input-sm\" value=\"'+neg_visita.tabela_visita[i].dataalerta+'\" id=\"dataalerta_visita'+i+'\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"><input type=\"text\" class=\"form-control input-sm\" value=\"'+neg_visita.tabela_visita[i].comentario+'\" id=\"comentario_visita'+i+'\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"> <button type=\"button\" class=\"btn btn-success btn-xs\" onclick=\"salvarNegociacaoVisita('+i+','+ide+') \">Ok <span class="glyphicon glyphicon-ok"></span></button>';
+			codigo_tabela += '<button type=\"button\" class=\"btn btn-warning btn-xs\" onclick=\"editarNegociacaoVisita('+i+','+ide+') \">Edit <span class="glyphicon glyphicon-pencil"></span></button>';
+			codigo_tabela += '<button type=\"button\" class=\"btn btn-danger btn-xs\" onclick=\"deleteNegociacaoVisita('+i+','+ide+') \">Del <span class="glyphicon glyphicon-remove"></span></button></td></tr>';
+			
+			
+		}
+		else
+		{
+			codigo_tabela += '<tr class=\"success\"><td class=\"col-sm-2\" id=\"dataalerta_visita'+i+'\">'+neg_visita.tabela_visita[i].dataalerta+' </td>';
+			codigo_tabela += '<td class=\"col-sm-2 control-label\" id=\"comentario_visita'+i+'\">'+neg_visita.tabela_visita[i].comentario+' </td>';
+			codigo_tabela += '<td class=\"col-sm-2 control-label\"><button type=\"button\" class=\"btn btn-warning btn-xs\" onclick=\"editarNegociacaoVisita('+i+','+ide+') \">Editar <span class="glyphicon glyphicon-pencil"></span></button>';
+			codigo_tabela += '<button type=\"button\" class=\"btn btn-danger btn-xs\" onclick=\"deleteNegociacaoVisita('+i+','+ide+') \">Deletar <span class="glyphicon glyphicon-remove"></span></button></td></tr>';
+		}
+	}
+	//NUEVA LINHA DE NEGOCIACAO!
+	codigo_tabela += '<tr style=\"visibility:collapse;\" id=\"adding_row_visita\"><td class=\"col-sm-2\"><input type=\"text\" class=\"form-control input-sm\" value=\"\" id=\"dataalerta_add_visita\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"><input type=\"text\" class=\"form-control input-sm\" value=\"\" id=\"comentario_add_visita\" </td>';
+			codigo_tabela += '<td class=\"col-sm-2\"> <button type=\"button\" class=\"btn btn-info btn-xs\" onclick=\"salvandoNovaLinhaNegociacaoVisita('+ide+') \">Salvar Linha <span class="glyphicon glyphicon-plus"></span></button></td></tr>';
+	
+	
+	
+	codigo_tabela += '</tbody></table><button type=\"button\" class=\"btn btn-info btn-xs\" onclick=\"AddNegociacaoVisita() \">Adicionar Linha de Visita <span class="glyphicon glyphicon-plus"></span></button>';
+	
+	$('#antiga_neg_visita').append(codigo_tabela);
+	
+	for( var i=0; i< neg_visita.tabela_visita.length;i++)
+	{
+	if(neg_visita.tabela_visita[i].checked == false)
+		{
+			iniciarDataTabela("#dataalerta_visita"+i);
+		}
+	}			
+}
+function salvarNegociacaoParcela(a,ide)
+{
+	if( parseFloat($('#valorparcela_'+a).val()) <= parseFloat(neg_pag.valorinicial.replace(",",".")) && $('#valorparcela_'+a).val() > 0 && $('#valorrecebido_'+a).val().length > 0)
+	{
+		window.location.replace("/salvarnegociacaoparcela?dataalerta="+$('#dataalerta_'+a).val()+"&valorparcela="+$('#valorparcela_'+a).val()+"&valorrecebido="+$('#valorrecebido_'+a).val()+"&comentario="+$('#comentario_'+a).val()+"&idlinhanegpag="+neg_pag.tabela_pagamento[a].id+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+	}
+	else if($('#valorrecebido_'+a).val().length == 0)
+	{
+		alert('O valor inserido no Valor Recebido '+$('#valorrecebido_'+a).val()+' não é correto');
+	}
+	else if(parseFloat($('#valorparcela_'+a).val()) > parseFloat(neg_pag.valorinicial.replace(",",".")) )
+	{
+		alert('O valor da parcela '+$('#valorparcela_'+a).val()+ 'não pode ser superior ao valor da dívida inicial'+neg_pag.valorinicial);
+	}
+	else if($('#dataalerta_'+a).val().length != 10)
+	{
+		alert('O valor inserido na Data da Alerta '+$('#dataalerta_'+a).val()+' não é correta');
+	}
+}
+//LIGAR
+function salvarNegociacaoLigar(a,ide)
+{
+	
+	if($('#dataalerta_ligar'+a).val().length != 10)
+	{
+		alert('O valor inserido na Data da Alerta '+$('#dataalerta_ligar'+a).val()+' não é correta');
+	}
+	else
+	{
+		window.location.replace("/salvarnegociacaoligar?dataalerta="+$('#dataalerta_ligar'+a).val()+"&comentario="+$('#comentario_ligar'+a).val()+"&idlinhanegligar="+neg_ligar.tabela_ligar[a].id+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+	}
+}
+//VISITA
+function salvarNegociacaoVisita(a,ide)
+{
+	
+	if($('#dataalerta_visita'+a).val().length != 10)
+	{
+		alert('O valor inserido na Data da Alerta '+$('#dataalerta_visita'+a).val()+' não é correta');
+	}
+	else
+	{
+		window.location.replace("/salvarnegociacaovisita?dataalerta="+$('#dataalerta_visita'+a).val()+"&comentario="+$('#comentario_visita'+a).val()+"&idlinhanegvisita="+neg_visita.tabela_visita[a].id+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+	}
+}
+function editarNegociacaoParcela(a,ide)
+{
+	if(neg_pag.tabela_pagamento[a].checked == false)
+	{
+		window.location.replace("/editarnegociacaoparcela?dataalerta="+$('#dataalerta_'+a).val()+"&valorparcela="+$('#valorparcela_'+a).val()+"&valorrecebido="+$('#valorrecebido_'+a).val()+"&comentario="+$('#comentario_'+a).val()+"&idlinhanegpag="+neg_pag.tabela_pagamento[a].id+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+	}
+	else
+	{
+		window.location.replace("/editarnegociacaoparcela?dataalerta="+neg_pag.tabela_pagamento[a].dataalerta+"&valorparcela="+neg_pag.tabela_pagamento[a].valorparcela+"&valorrecebido="+neg_pag.tabela_pagamento[a].valorrecibido+"&comentario="+neg_pag.tabela_pagamento[a].comentario+"&idlinhanegpag="+neg_pag.tabela_pagamento[a].id+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+	}
+}
+//LIGAR
+function editarNegociacaoLigar(a,ide)
+{
+	if(neg_ligar.tabela_ligar[a].checked == false)
+	{
+		window.location.replace("/editarnegociacaoligar?dataalerta="+$('#dataalerta_ligar'+a).val()+"&comentario="+$('#comentario_ligar'+a).val()+"&idlinhanegligar="+neg_ligar.tabela_ligar[a].id+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+	}
+	else
+	{
+		window.location.replace("/editarnegociacaoligar?dataalerta="+neg_ligar.tabela_ligar[a].dataalerta+"&comentario="+neg_ligar.tabela_ligar[a].comentario+"&idlinhanegligar="+neg_ligar.tabela_ligar[a].id+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+	}
+}
+//VISITA
+function editarNegociacaoVisita(a,ide)
+{
+	if(neg_visita.tabela_visita[a].checked == false)
+	{
+		window.location.replace("/editarnegociacaovisita?dataalerta="+$('#dataalerta_visita'+a).val()+"&comentario="+$('#comentario_visita'+a).val()+"&idlinhanegvisita="+neg_visita.tabela_visita[a].id+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+	}
+	else
+	{
+		window.location.replace("/editarnegociacaovisita?dataalerta="+neg_visita.tabela_visita[a].dataalerta+"&comentario="+neg_visita.tabela_visita[a].comentario+"&idlinhanegvisita="+neg_visita.tabela_visita[a].id+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+	}
+}
+function deleteNegociacaoParcela(a,ide)
+{
+	var r = confirm("Tem certeza que ta querendo deletar essa linha de Negociação?");
+	if (r == true) {
+	    window.location.replace("/deletarnegociacaoparcela?idnegpag="+neg_pag.id+"&idlinhanegpag="+neg_pag.tabela_pagamento[a].id+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+	} 
+}
+//LIGAR
+function deleteNegociacaoLigar(a,ide)
+{
+	var r = confirm("Tem certeza que ta querendo deletar essa linha de Ligação?");
+	if (r == true) {
+	    window.location.replace("/deletarnegociacaoligar?idnegligar="+neg_ligar.id+"&idlinhanegligar="+neg_ligar.tabela_ligar[a].id+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+	} 
+}
+//VISITA
+function deleteNegociacaoVisita(a,ide)
+{
+	var r = confirm("Tem certeza que ta querendo deletar essa linha de Visita?");
+	if (r == true) {
+	    window.location.replace("/deletarnegociacaovisita?idnegvisita="+neg_visita.id+"&idlinhanegvisita="+neg_visita.tabela_visita[a].id+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+	} 
+}
+function AddNegociacaoParcela(ide)
+{
+	$('#adding_row').css('visibility', 'visible');
+	iniciarDataTabela('#dataalerta_add');
+}
+//LIGAR
+function AddNegociacaoLigar(ide)
+{
+	$('#adding_row_ligar').css('visibility', 'visible');
+	iniciarDataTabela('#dataalerta_add_ligar');
+}
+//VISITA
+function AddNegociacaoVisita(ide)
+{
+	$('#adding_row_visita').css('visibility', 'visible');
+	iniciarDataTabela('#dataalerta_add_visita');
+}
+function salvandoNovaLinhaNegociacao(ide)
+{
+
+	window.location.replace("/adicionarnegociacaoparcela?id_neg_pag="+neg_pag.id+"&dataalerta="+$('#dataalerta_add').val()+"&valorparcela="+$('#valorparcela_add').val()+"&valorrecebido="+$('#valorrecebido_add').val()+"&comentario="+$('#comentario_add').val()+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+}
+//LIGAR
+function salvandoNovaLinhaNegociacaoLigar(ide)
+{
+
+	window.location.replace("/adicionarnegociacaoligar?id_neg_ligar="+neg_ligar.id+"&dataalerta="+$('#dataalerta_add_ligar').val()+"&comentario="+$('#comentario_add_ligar').val()+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+}
+//VISITA
+function salvandoNovaLinhaNegociacaoVisita(ide)
+{
+
+	window.location.replace("/adicionarnegociacaovisita?id_neg_visita="+neg_visita.id+"&dataalerta="+$('#dataalerta_add_visita').val()+"&comentario="+$('#comentario_add_visita').val()+"&idcliente="+cliente.id+"&idcontrato="+cliente.contrato[ide]);
+}		
+</script>
+
+</body>
+</html>

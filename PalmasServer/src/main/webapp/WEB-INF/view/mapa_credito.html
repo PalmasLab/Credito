@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UFT-8">
+ <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+  <link href="http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
+  <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+  
+		 <!-- Versión compilada y comprimida del CSS de Bootstrap -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+ <script src="/js/bootstrap-datepicker.js"></script>
+ <link href="/css/datepicker.css" rel="stylesheet">
+<!-- Tema opcional -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+ 
+<!-- Versión compilada y comprimida del JavaScript de Bootstrap -->
+			<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+			
+		    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+		    <meta name="viewport" content="width=device-width, initial-scale=1">
+		 
+	 
+		 
+		    
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+  <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
+  <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>	
+  <script type="text/javascript" src="/js/jquery.dialogextend.js"></script>  
+  <script src="/js/bootstrap-switch.js"></script>
+  <link href="css/bootstrap-switch.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+	<style type="text/css">
+	
+.datepicker {
+	z-index: 1100;
+	}
+.testingarea{
+    width: 50px; 
+    position: absolute;
+    height: 24px;
+    overflow: hidden;
+    margin-left: 84px;
+}
+.testingarea:before{
+    content: "";
+    width: 50px;
+    position: absolute;
+    height: 50px;
+    -webkit-transform: rotate(45deg);
+    border: 1px solid red;
+    top: 12px;
+    border: 2px solid;
+    z-index: 10;
+    background: white;
+}
+.abc{
+    width: 200px;
+    height: 150px;
+    position: absolute;
+    margin-top: 22px;
+    border: 2px solid;
+    border-radius: 8px;
+    background: white;
+}
+.c12{
+    width: 155px;
+    height: 155px;
+    display:none;
+}
+	#title_jumbotron {
+				  height: 250px;
+				  color: white;
+				  text-shadow: #444 0 1px 1px;
+				  background:transparent;
+				  background-size: 100% 100%;
+				}
+	#relacao_pontos_inseridos{
+	 text-align: center;
+		
+	}
+	body
+	{
+	background: url('img/fundo.png');
+	background-repeat: repeat;
+	background-size: 20% 15%;
+	}
+	#buscador
+	{
+		margin-top: -20px;
+		position:absolute;
+		float:center;
+		margin-left: 400px;
+	}	
+	#buscador2
+	{
+		margin-top: -20px;
+		position:absolute;
+		float:center;
+		margin-left: 650px;
+	}
+	#botao_relatorio
+	{
+		margin-top: 10px;
+	}
+	.loader {
+	position: fixed;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 100%;
+	z-index: 9999;
+	background: url('img/page-loader.gif') 50% 50% no-repeat rgb(249,249,249);
+}
+#mapa
+{
+	float: left;
+    width:100%;
+    height:500px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px; 
+    border:1px solid #666;
+   
+    margin-bottom:1em;
+    box-shadow: 0px 0px 10px #333;
+}	  
+.input-color {
+    position: relative;
+    float: left;
+    margin-left: 20px;
+}
+.input-color input {
+    padding-left: 20px;
+}
+.input-color .color-box {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    background-color: #ccc;
+    position: absolute;
+    left: 5px;
+    top: 5px;
+}  
+myPosition {
+    position: absolute;
+    right: 200px; /* use a length or percentage */
+}
+		    </style>
+</head>
+<body  role="document" th:inline="text">
+	<div class="loader"></div> 
+
+<!-- Navbar -->
+		
+		<nav class="navbar navbar-inverse navbar-fixed-top" >
+		    <div class="container">
+		        <div class="navbar-header">
+		            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+		                <span class="sr-only">Toggle navigation</span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		            </button>
+		            
+		        </div>
+		        <div id="navbar"  class="navbar-collapse collapse">
+		            <ul class="nav navbar-nav navbar-left">
+		            	<a class="navbar-brand" href="#" >PalmasLab</a>
+		                <li th:classappend="${page == 'home' ? 'active' : ''}" ><a href="#" th:target="_blank" th:href="@{/update_mapa_credito_form}">Atualizar Banco Dados</a></li>
+		                <li th:classappend="${page == 'home' ? 'active' : ''}" ><a href="#" th:target="_blank" th:href="@{/update_gps_form}">Posicoes GPS</a></li>
+		                <li id="buscador">
+			                <form class="navbar-form" role="search" name="search-form"  th:target="_blank"  action="#" th:action="@{'/procuraporid_cliente_credito'}" th:object="${seguimento_cliente}" method="post">>
+							        	<div class="input-group">
+								            <input type="text" class="form-control" th:field="*{novo_seguimento}" placeholder="Procura de Cliente por ID" id="query" name="query" value="">
+									            
+								            		<button type="submit" class="btn btn-success"><i class="glyphicon glyphicon-search"></i></button>
+								            	
+								        </div>
+						    </form>
+						</li> 
+						<li id="buscador2">
+						<form class="navbar-form" role="search" name="search-form"  th:target="_blank"  action="#" th:action="@{'/procuraporendereco'}" th:object="${Buscaendereco}" method="post">>
+							        	<div class="input-group">
+								            <input type="text" class="form-control" th:field="*{endereco}" placeholder="Escreva o nome da Rua" id="query" name="query" value="">
+									            
+								            		<button type="submit" class="btn btn-success"><i class="glyphicon glyphicon-search"></i></button>
+								            	
+								        </div>
+						    </form>
+						</li> 
+						
+		             </ul>
+		            <ul class="nav navbar-nav navbar-right">
+		            	<li >
+							<button  id="botao_relatorio"onclick="" class="btn btn-primary btn-sm pull-right">Relatorio Pagamentos <i class="glyphicon glyphicon-download"></i></button>
+						</li>
+		                <li th:if="${#authorization.expression('!isAuthenticated()')}"><a href="/signin" th:href="@{/signin}">Sign in</a></li>
+		                <li th:if="${#authorization.expression('isAuthenticated()')}"><a href="/logout" th:href="@{/logout}">Logout</a></li>
+		            </ul>
+		        </div>
+		        <!--/.nav-collapse -->
+		    </div>
+		</nav>
+		
+	
+	 
+		 <div class="container theme-showcase"  role="main">
+		    
+			 	<div class="jumbotron" id="title_jumbotron">
+				        <h1 style='text-align:center; margin-top:60px;text-shadow: 2px 2px #000000; '>Credito: Clientes em Risco </h1>
+				        
+				</div>
+		  <div class="page-header">
+						
+							<div class="jumbotron">
+								<div class="row">
+									
+									<div class="col-md-8" style="border-right:1px solid green;">
+										<h4 style="text-align:center;"><b >Ultima Atualizacao do Mapa: [[${clientes_banco[0].data_ultima_atualizacao}]]</b></h4>
+										<div id="mapa"></div>
+										
+									</div>
+										<div class="col-md-4" style="float:right;">
+											<div class="row">	
+												<div id="filtros" style="text-align:center;"><h4 ><b>Filtros</b></h4>
+														<div class="col-md-6">
+															<table class="table table-striped" >
+													<thead >
+														<td  colspan=2 style="text-align:center;"><b>Risco</b></td>
+													</thead>
+														<tbody >
+															<tr>
+																<td><b>Todos</</b></td>
+																<td ><input type="checkbox" name="risco-todos" class="todos_risco_checkbox" onclick='handleClick(this);'checked> </input><br></td>
+															</tr>
+														    <tr>
+																<td ><b>AA</</b></td>
+																<td ><input type="checkbox" name="AA" class="resto_risco_checkbox"onclick='handleClick(this);'> </input><br></td>
+															</tr>
+															<tr>
+																<td ><b>A</</b></td>
+																<td ><input type="checkbox" name="A" class="resto_risco_checkbox"onclick='handleClick(this);'> </input><br></td>
+															</tr>
+															<tr>
+																<td ><b>B</</b></td>
+																<td ><input type="checkbox" name="B" class="resto_risco_checkbox"onclick='handleClick(this);'> </input><br></td>
+															</tr>
+														    <tr>
+																<td ><b>C</</b></td>
+																<td ><input type="checkbox" name="C" class="resto_risco_checkbox"onclick='handleClick(this);'> </input><br></td>
+															</tr>
+															<tr>
+																<td ><b>D</</b></td>
+																<td ><input type="checkbox" name="D" class="resto_risco_checkbox"onclick='handleClick(this);'> </input><br></td>
+															</tr>
+															<tr>
+																<td ><b>E</</b></td>
+																<td ><input type="checkbox" name="E" class="resto_risco_checkbox"onclick='handleClick(this);'> </input><br></td>
+															</tr>
+														    <tr>
+																<td ><b>F</</b></td>
+																<td ><input type="checkbox" name="F" class="resto_risco_checkbox"onclick='handleClick(this);'> </input><br></td>
+															</tr>
+															<tr>
+																<td ><b>G</</b></td>
+																<td ><input type="checkbox" name="G" class="resto_risco_checkbox"onclick='handleClick(this);'> </input><br></td>
+															</tr>
+															<tr>
+																<td ><b>H</</b></td>
+																<td ><input type="checkbox" name="H" class="resto_risco_checkbox"onclick='handleClick(this);'> </input><br></td>
+															</tr>
+														    
+														    </table>
+														</div>
+														<div class="col-md-6">
+															<table class="table table-striped" >
+																<thead>
+																	<td colspan=2 style="text-align:center;"><b>Situação</b></td>
+																</thead>
+																<tbody >
+																	<tr>
+																		<td ><b>Todos</</b></td>
+																		<td ><input type="checkbox" name="situacao-todos" class="todos_situacao_checkbox" onclick="handleClick()" checked> </input><br></td>
+																	</tr>
+																    <tr>
+																		<td ><b>Liquidados</</b></td>
+																		<td ><input type="checkbox" name="situacao-liquidado" class="resto_situacao_checkbox" onclick="handleClick(this)"> </input><br></td>
+																	</tr>
+																	<tr>
+																		<td ><b>Ativos</</b></td>
+																		<td ><input type="checkbox" name="situacao-ativo" class="resto_situacao_checkbox" onclick="handleClick(this)"> </input><br></td>
+																	</tr>
+																	<tr>
+																		<td ><b>Perdas</</b></td>
+																		<td ><input type="checkbox" name="situacao-perda" class="resto_situacao_checkbox" onclick="handleClick(this)"> </input><br></td>
+																	</tr>
+															   </tbody>
+														    
+														    </table>
+														    
+														</div>
+													</div>
+												</div>
+												<div class="row" style="position:relative; align:center;">
+													<div style="text-align:center;">
+														<button onclick=" FilterCount() "  class="btn  btn-success" style="position:relative; align:center;"><b>Filtrar</b></button>
+													</div>	
+												</div>
+											</div>
+								</div>
+								<div class="row">
+									<div class="col-md-8" style="border-right:1px solid green;">
+										<div class="input-color">
+										    <input type="text" value="Liquidado" />
+										    <div class="color-box" style="background-color: #00FF00;"></div>
+										    <!-- Replace "#FF850A" to change the color -->
+										</div>
+										<div class="input-color">
+										    <input type="text" value="Ativo" />
+										    <div class="color-box" style="background-color: #F7FE2E;"></div>
+										    <!-- Replace "#FF850A" to change the color -->
+										</div>
+										<div class="input-color">
+										    <input type="text" value="Perda" />
+										    <div class="color-box" style="background-color: #FF0000;"></div>
+										    <!-- Replace "#FF850A" to change the color -->
+										</div>
+									</div>
+									<div class="col-md-4">
+										<table class="table table-striped" style="margin-top:-40px;">
+													<thead>
+														<td colspan=2 style="text-align:center;"><h4><b>Resultados da Busca</b></h4></td>
+													</thead>
+															<tbody id="resultados_da_busca">
+															
+															</tbody>
+										</table>
+									</div>
+									
+									
+								</div>
+							</div>
+							</div>
+							
+							<div class="jumbotron">
+								<div class="row">
+										<table class="table table-striped" >
+													<thead>
+														<td colspan=2 style="text-align:center;"><h2><b>Status da Plataforma</b></h2></td>
+													</thead>
+															<tbody id="relacao_pontos_inseridos">
+															
+															</tbody>
+										</table>					
+								
+							</div>
+				</div>
+				
+				
+		</div>
+	</div>
+		 <div id="meu-dialog"></div>
+</body>
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+$(window).load(function() {
+	$(".loader").fadeOut("slow");
+})
+</script>
+    <script th:inline="javascript" type="text/javascript">
+ 	function botaoRelatorio()
+ 	{
+ 		window.open("/downloadrelatorio?datainicio="+$('#datainicio_relatorio').val()+"&datafinal="+$('#datafinal_relatorio').val());
+ 	}
+ 	var alertas = [[${alertas}]];
+   
+    
+    
+    ChangeBackgroungImageOfTab("title_jumbotron","img/capa.png");
+    
+    //ACTIVANDO CHECKBOXES!
+	$("[class='todos_risco_checkbox']").bootstrapSwitch('size','mini');
+	$("[class='resto_risco_checkbox']").bootstrapSwitch('size','mini');
+	
+	$("[class='todos_situacao_checkbox']").bootstrapSwitch('size','mini');
+	$("[class='resto_situacao_checkbox']").bootstrapSwitch('size','mini');
+	
+	$("[name='situacao-liquidado']").bootstrapSwitch('onColor','success');
+	$("[name='situacao-ativo']").bootstrapSwitch('onColor','warning');
+	$("[name='situacao-perda']").bootstrapSwitch('onColor','danger');
+	
+	
+	$('input[class="todos_risco_checkbox"]').on('switchChange.bootstrapSwitch', function(event, state) {
+	 checkBoxListener(this,event,state);
+	});
+	$('input[class="resto_risco_checkbox"]').on('switchChange.bootstrapSwitch', function(event, state) {
+	 checkBoxListener(this,event,state);
+	});
+	$('input[class="todos_situacao_checkbox"]').on('switchChange.bootstrapSwitch', function(event, state) {
+	 checkBoxListener(this,event,state);
+	});
+	$('input[class="resto_situacao_checkbox"]').on('switchChange.bootstrapSwitch', function(event, state) {
+	 checkBoxListener(this,event,state);
+	});
+	
+	function resultados_da_busca(clientes_busca)
+	{
+		var clientes_mapeados = 0;
+		for( var i = 0; i< clientes_busca.length;i++)
+		{
+			if(clientes_busca[i].gpspositionupdated == true)
+			{
+				clientes_mapeados++;
+			}
+		}
+		
+		document.getElementById("resultados_da_busca").innerHTML = "<tr><td> Clientes achados: </td><td>"+clientes_busca.length+"</td></tr><tr><td> Clientes mapeados: </td><td>"+clientes_mapeados+"</td></tr>";
+	}
+	
+	
+	function checkBoxListener(myObject, myEvent, myStatus)
+	{
+		 //RISCOS
+	 	 if(myObject.name == "risco-todos" && myStatus == true)
+	 	 {
+	 	 	$('[class="resto_risco_checkbox"]').bootstrapSwitch('state', false);
+	 	 } 
+	 	 if(myObject.className == "resto_risco_checkbox" && myStatus == true)
+	 	 {
+	 	 	$('[name="risco-todos"]').bootstrapSwitch('state', false);
+	 	 	var resto_checkboxes = $('[class="resto_risco_checkbox"]');
+	 	 	var contador = 0;
+		 	 	for(var i=0; i< resto_checkboxes.length; i++)
+		 	 	{
+		 	 		if(resto_checkboxes[i].checked == true)
+		 	 		{
+		 	 			contador++;
+		 	 		}
+		 	 	}
+		 	 	if(contador == resto_checkboxes.length)
+		 	 	{
+		 	 		$('[class="resto_risco_checkbox"]').bootstrapSwitch('state', false);
+		 	 		$('[name="risco-todos"]').bootstrapSwitch('state', true);
+		 	 	}
+	 	 } 
+	 	 //SITUAÇÕES
+	 	  if(myObject.name == "situacao-todos" && myStatus == true)
+	 	 {
+	 	 	$('[class="resto_situacao_checkbox"]').bootstrapSwitch('state', false);
+	 	 } 
+	 	 if(myObject.className == "resto_situacao_checkbox" && myStatus == true)
+	 	 {
+	 	 	$('[name="situacao-todos"]').bootstrapSwitch('state', false);
+	 	 	var resto_checkboxes = $('[class="resto_situacao_checkbox"]');
+	 	 	var contador = 0;
+		 	 	for(var i=0; i< resto_checkboxes.length; i++)
+		 	 	{
+		 	 		if(resto_checkboxes[i].checked == true)
+		 	 		{
+		 	 			contador++;
+		 	 		}
+		 	 	}
+		 	 	if(contador == resto_checkboxes.length)
+		 	 	{
+		 	 		$('[class="resto_situacao_checkbox"]').bootstrapSwitch('state', false);
+		 	 		$('[name="situacao-todos"]').bootstrapSwitch('state', true);
+		 	 	}
+	 	 } 
+	}
+		
+    var numeroPerguntas = 1;
+    
+	 
+    var tipoRiscos = [];
+    tipoRiscos.push("A");tipoRiscos.push("AA");tipoRiscos.push("B");tipoRiscos.push("C");tipoRiscos.push("D");tipoRiscos.push("E");tipoRiscos.push("F");tipoRiscos.push("G");tipoRiscos.push("H");
+    
+    
+    var clientes_banco = [[${clientes_banco}]];
+    var clientes_filtrados = clientes_banco;
+    LoadMapa(clientes_filtrados);
+    var jumboHeight = $('.jumbotron').outerHeight();
+    
+    
+    
+    contar_relacao_pontos_inseridos();
+    
+    function contar_relacao_pontos_inseridos()
+    {
+    	var contador_markers_ok = 0;
+    	for(var i = 0; i< clientes_banco.length; i++)
+    	{
+    		if(clientes_banco[i].gpspositionupdated == true)
+    		{
+    			contador_markers_ok++;
+    		}
+    	}
+    	
+    	if(contador_markers_ok == clientes_banco.length)
+    	{
+    		$('#relacao_pontos_inseridos').append('<h4><tr><td><b>Status Clientes no Mapa:</td><td> <span style=\"color:green\"> OK</span></td> </b></tr> <tr><td>Numero de Clientes Mapeados:</td> <td> '+contador_markers_ok+'</td></tr> <tr><td>Número de Clientes Total:</td> <td>'+clientes_banco.length+'</td></tr></h4>');
+    	}
+    	else
+    	{
+    	$('#relacao_pontos_inseridos').append('<tr><td>Status Clientes no Mapa:</td><td> <span style=\"color:red\"> Faltam '+(clientes_banco.length - contador_markers_ok)+' Clientes por Mapear</span></td> </tr> <tr><td>Numero de Clientes Mapeados:</td> <td> '+contador_markers_ok+'</td></tr> <tr><td>Número de Clientes Total:</td> <td>'+clientes_banco.length+'</td></tr>');
+    	}
+    	
+    }
+	function parallax()
+	{
+	    var scrolled = $(window).scrollTop();
+	    $('.bg').css('height', (jumboHeight-scrolled) + 'px');
+	}
+
+	$(window).scroll(function(e){
+	    parallax();
+	});
+	
+
+		function ChangeBackgroungImageOfTab(tabName, imagePrefix)
+		{
+		    document.getElementById(tabName).style.backgroundImage = "url(/" + imagePrefix+")";
+		}
+//	loadMapProject();
+	function loadMapProject()
+	{
+	
+			$('#filtros').append('<h4 >Filtro: Tipo de Risco </h4>');
+			
+				
+					$('#filtros').append('<input type=\"checkbox\" class=\"todos_checkbox\" name=\"0\" value=\"0\" checked>Todos<br>');
+				
+					$('#filtros').append('<input type=\"checkbox\" class=\"resto_checkbox\" name=\"0\" value=\"1\" >AA <br>');
+					$('#filtros').append('<input type=\"checkbox\" class=\"resto_checkbox\" name=\"0\" value=\"2\" >A <br>');
+					$('#filtros').append('<input type=\"checkbox\" class=\"resto_checkbox\" name=\"0\" value=\"3\" >B <br>');
+					$('#filtros').append('<input type=\"checkbox\" class=\"resto_checkbox\" name=\"0\" value=\"4\" >C <br>');
+					$('#filtros').append('<input type=\"checkbox\" class=\"resto_checkbox\" name=\"0\" value=\"5\" >D <br>');
+					$('#filtros').append('<input type=\"checkbox\" class=\"resto_checkbox\" name=\"0\" value=\"6\" >E <br>');
+					$('#filtros').append('<input type=\"checkbox\" class=\"resto_checkbox\" name=\"0\" value=\"7\" >F <br>');
+					$('#filtros').append('<input type=\"checkbox\" class=\"resto_checkbox\" name=\"0\" value=\"8\" >G <br>');
+					$('#filtros').append('<input type=\"checkbox\" class=\"resto_checkbox\" name=\"0\" value=\"9\" >H <br>');
+				
+			$('#filtros').append('<button onclick=\" FilterCount() \">Filtrar</button> </form>');		
+					
+				
+	}
+	function FilterCount(){
+ 	
+	 var clientes_filtrados = [];
+	 var clientes_filtrados_final = [];
+	 var todos_situacao = false;
+	 var perda_situacao = false;
+	 var ativo_situacao = false;
+	 var liquidado_situacao = false;
+	 var todos_risco = false;
+	 var resto_risco = false;
+	 //1- ANALIZAR SITUAÇÃO
+	 
+	 	//1.1-VER SI TODOS ESTÁ ACTIVO
+	 	
+	 	var checkbox = $('[name="situacao-todos"]');
+	 	
+	 	if(checkbox[0].checked == true)
+	 	{
+	 	
+	 		todos_situacao = true;
+	 	}
+	 	
+	 	//1.2- VER RESTO ESTA ACTIVO
+	 	
+	 	checkbox = $('[name="situacao-liquidado"]');
+	 	if(checkbox[0].checked == true)
+	 	{
+	 		liquidado_situacao = true;
+	 	}
+	 	checkbox = $('[name="situacao-ativo"]');
+	 	if(checkbox[0].checked == true)
+	 	{
+	 		ativo_situacao = true;
+	 	}
+	 	checkbox = $('[name="situacao-perda"]');
+	 	if(checkbox[0].checked == true)
+	 	{
+	 		perda_situacao = true;
+	 	}
+	 if(todos_situacao)
+	 {
+	 	clientes_filtrados = clientes_banco;
+	 }
+	 
+	 if(perda_situacao)
+	 {
+		 for (var i = 0; i< clientes_banco.length; i++)
+		 {
+		 	var wasPushed = false;
+		 	
+		 	for( var j =0; j< clientes_banco[i].situacao.length &&!wasPushed;j++)
+		 	{
+		 	
+		 		if(clientes_banco[i].situacao[j] == "PERDA")
+		 		{
+		 			clientes_filtrados.push(clientes_banco[i]);
+		 			wasPushed = true;
+		 		}
+		 	}
+		 }
+	 }
+	 
+	 if(ativo_situacao)
+	 {
+	  
+		 for (var i = 0; i< clientes_banco.length; i++)
+		 {
+		 	var dacerto = true;
+		 	var wasPushed = false;
+		 	
+		 	for( var j =0; j< clientes_banco[i].situacao.length;j++)
+		 	{
+		 		if(clientes_banco[i].situacao[j] == "PERDA")
+		 		{
+		 			dacerto = false;
+		 		}
+		 	}
+		 	for( var j =0; j< clientes_banco[i].situacao.length && !wasPushed;j++)
+		 	{
+		 		if(clientes_banco[i].situacao[j] == "ATIVO" && dacerto)
+		 		{
+		 			clientes_filtrados.push(clientes_banco[i]);
+		 			wasPushed = true;
+		 		}
+		 	}
+		 }
+	 }
+	 
+	  if(liquidado_situacao)
+	 {
+	  
+		 for (var i = 0; i< clientes_banco.length; i++)
+		 {
+		 	var dacerto = true;
+		 	var wasPushed = false;
+		 	
+		 	for( var j =0; j< clientes_banco[i].situacao.length;j++)
+		 	{
+		 		
+		 		
+		 		if(clientes_banco[i].situacao[j] == "PERDA" || clientes_banco[i].situacao[j] == "ATIVO")
+		 		{
+		 			dacerto = false;
+		 		}
+		 	}
+		 	for( var j =0; j< clientes_banco[i].situacao.length && !wasPushed;j++)
+		 	{
+		 		
+		 		
+		 		if(clientes_banco[i].situacao[j] == "LIQUIDADO" && dacerto)
+		 		{
+		 			clientes_filtrados.push(clientes_banco[i]);
+		 			wasPushed = true;
+		 		}
+		 	}
+		 }
+	 }
+	 //	2- ANALIZAR OS RISCOS
+	 
+	 
+	 if($('[name="risco-todos"]')[0].checked == true)
+	 {
+	 	todos_risco = true;
+	 	clientes_filtrados_final = clientes_filtrados;
+	 }
+	 else
+	 {
+	 	var riscos_escolhidos = [];
+	 	for(var i=0; i<$('[class="resto_risco_checkbox"]').length;i++)
+	 	{
+	 		if($('[class="resto_risco_checkbox"]')[i].checked == true)
+	 		{
+	 			riscos_escolhidos.push($('[class="resto_risco_checkbox"]')[i]);
+	 		}
+	 	}
+	 	
+	 	for (var i = 0; i< clientes_filtrados.length; i++)
+		 {
+		 	var wasPushed = false;
+		 	
+		 	for( var j =0; j< clientes_filtrados[i].risco.length &&!wasPushed;j++)
+		 	{
+		 		for(var k = 0; k<riscos_escolhidos.length &&!wasPushed ; k++)
+		 		{
+		 		
+			 		if(clientes_filtrados[i].risco[j] == riscos_escolhidos[k].name)
+			 		{
+			 			clientes_filtrados_final.push(clientes_filtrados[i]);
+			 			wasPushed = true;
+			 		}
+				}			 		
+		 	}
+		 }
+	 	
+	 }
+	 
+	 
+	 
+	 
+	 
+	 
+	 if(!todos_situacao && !perda_situacao && !ativo_situacao && !liquidado_situacao && !todos_risco && !resto_risco)
+	 {
+	 	alert("Escolha algum Filtro!");
+	 }
+	 else
+	 {
+	 	
+	 	LoadMapa(clientes_filtrados_final);
+	 }
+
+		    
+		
+	}	
+		//MAPA!!!!!!!
+function LoadMapa(value)
+{
+
+	
+	resultados_da_busca(value);
+	
+	initialize(value);
+  
+     
+// google.maps.event.addDomListener(window, 'load', initialize);
+
+}
+   function abrirInfoBox(id, marker) {
+	   
+			if (typeof(idInfoBoxAberto) == 'number' && typeof(infoBox[idInfoBoxAberto]) == 'object') {
+				infoBox[idInfoBoxAberto].close();
+			}
+			infoBox[id].open(map, marker);
+			idInfoBoxAberto = id;
+		}
+ function initialize(value) {
+   		
+   	
+   
+   		
+   		var idInfoBoxAberto;
+		var infoBox = [];
+        var mapCanvas = document.getElementById('mapa');
+        
+        var mapOptions = {
+          center: new google.maps.LatLng(-3.7280,-38.5303),
+          zoom: 12,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+        
+        var map = new google.maps.Map(mapCanvas, mapOptions);
+    	var latlngbounds = new google.maps.LatLngBounds();
+    	var markers = [];
+    	var contador = 0;
+    	var MaxSize = 0;
+    	$.each(value, function(i,e) {
+	    	
+	    		if(e.gpspositionupdated == true)
+	    		{
+	    			MaxSize++;
+	    		}
+	    	
+	    });	
+	    
+		 $.each(value, function(i,e) {
+		 //TEXT BOX CUSTOMIZATION     
+		 	if(e.gpspositionupdated == true)
+		 	{
+		 	contador++;
+		       																						
+            var BoxElements = "<h4  font-weight: bold; text-align:center;>"+e.nome_cliente + "</h4><br>" + "Tipo de Risco:"+e.risco + "<br>" + "Situação:"+e.situacao+ "<br>" + "Endereço:"+e.endereco+ "<br>" + "Fone:"+e.fone+"<br>" ;
+           
+           
+//OBTAINING IMAGES_pATH_LIST:
+			var image_url = "get_images_path/"+e.id;
+			 
+			var imagesLoaded = false;	
+//BUILDING THE HIPERLINK			
+			var hiperLink =  "<a href=\"cliente_credito/?id="+e.id+"\" target=\"_blank\">Mais Informação</a>" ;	
+			
+			var pinColor;
+			var isPerda = false;
+			var isAtivo = false;
+			var isLiquidado = false;
+			
+			for(var y = 0; y < e.situacao.length ; y++)
+			{
+				if(e.situacao[y] == "PERDA")
+				{
+					isPerda = true;
+					detetado = true;
+					
+				}
+			}	
+			
+				
+			if(!isPerda)
+			{
+				for(var y = 0; y < e.situacao.length ; y++)
+				{
+					if(e.situacao[y] == "ATIVO")
+					{
+						isAtivo = true;
+						detetado = true;
+						
+					}
+				}
+			}
+			if(!isPerda && !isAtivo)
+			{
+				isLiquidado = true;
+			}
+			
+			
+			if(isPerda)
+			{
+				pinColor = "FF0000";
+			}
+			else if(isAtivo)
+			{
+				pinColor = "F7FE2E";
+			}
+			else
+			{
+				pinColor = "00FF00";
+			}
+					
+			var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+						    new google.maps.Size(21, 34),
+						    new google.maps.Point(0,0),
+						    new google.maps.Point(10, 34));
+			
+			   marker = new google.maps.Marker({
+                map: map,
+                draggable: true,
+                position: new google.maps.LatLng(new Number(e.latitude), new Number(e.longitude)),
+                title: e.nome_cliente[0],
+                visible: true,
+                icon: pinImage
+            }),
+            boxText = document.createElement("div"),
+            //these are the options for all infoboxes
+            myOptions = {
+                 content: boxText,
+                disableAutoPan: false,
+                maxWidth: 0,
+                pixelOffset: new google.maps.Size(-140, 0),
+                zIndex: null,
+                boxStyle: {
+                    background: "url('http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/examples/tipbox.gif') no-repeat",
+                    opacity: 0.75,
+                    width: "280px"
+                },
+                closeBoxMargin: "12px 4px 2px 2px",
+                closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
+                infoBoxClearance: new google.maps.Size(1, 1),
+                isHidden: false,
+                pane: "floatPane",
+                enableEventPropagation: false
+            };
+            
+   			//define the text and style for all infoboxes
+            boxText.style.cssText = " border: 1px solid black; margin-top: 8px; background:#333; color:#FFF; font-family:Arial; font-size:12px; padding: 5px; border-radius:6px; -webkit-border-radius:6px; -moz-border-radius:6px;";
+            
+	
+			BoxElements = BoxElements + hiperLink;
+			
+			boxText.innerHTML = BoxElements;
+		    infoBox[new Number(e.id)] = new InfoBox(myOptions);
+        	
+			infoBox[new Number(e.id)].marker = marker;
+			
+			var ib = new InfoBox(myOptions);
+	
+			google.maps.event.addListener(marker, "click", function (e) {
+			boxText.innerHTML = BoxElements ;
+			  ib.open(map, this);  // change the map variable appropriately
+		
+			});
+			
+		markers.push(marker);
+		latlngbounds.extend(marker.position);
+		
+			if(contador == MaxSize)
+		 	{
+		 		var markerCluster = new MarkerClusterer(map, markers);
+				map.fitBounds(latlngbounds);
+				
+			}
+		
+		
+    		} //	CIERRO EL IF DE LOS GPS_UPDATED
+			});//CIERRA EACH PRINCIPAL DE CADA PUNTO
+ 	
+		 	google.maps.event.addListenerOnce(map, 'idle', function(){
+		    loadDialogAlerts();
+		});
+			
+}
+function loadingAlertsCode()
+{
+	var code ="<div id=\"scrollable_box\" style=\"overflow-y:scroll; height:400px; \">";
+	var background;
+	var buttoncolor;
+	var tituloAlerta;
+	if(alertas != null && alertas != "")
+	{
+		for( var i = 0; i < alertas.length; i ++)
+		{
+			if(alertas[i].tipoalerta == "PAGAMENTO")
+			{
+				background = '<div class=\"alert alert-info\" role=\"alert\" style=\"margin-right:10px;\">';
+				buttoncolor = 'btn-info';
+				tituloAlerta = 'Alerta de Pagamento';
+			}
+			else if(alertas[i].tipoalerta == "LIGAR")
+			{
+				background= '<div class=\"alert alert-warning\" role=\"alert\" style=\"margin-right:10px;\">';
+				buttoncolor='btn-warning';
+				tituloAlerta = 'Alerta Ligacao';
+			}
+			else
+			{
+				background= '<div class=\"alert alert-danger\" role=\"alert\" style=\"margin-right:10px;\">';
+				buttoncolor='btn-danger';
+				tituloAlerta = 'Alerta de Visita';
+			}
+			code +=background;
+			code += "<table><tbody><tr><td colspan=\"2\" style=\"text-align:center; font-weight: bold;font-size: 15px;\">"+tituloAlerta+"</td></tr>";
+			code += "<tr><td style=\"font-weight: bold;font-size: 10px;\">Nome </td>"
+			code +="<td style=\"font-style: italic;font-size: 10px;\">"+alertas[i].nomecliente+"</td></tr>";
+			code += "<tr><td style=\"font-weight: bold;font-size: 10px;\">Data </td>";
+			code +="<td style=\"font-style: italic;font-size: 10px;\">"+alertas[i].dataalerta+"</td></tr>";
+			code += "<td colspan=\"2\" style=\"text-align:center; \"font-style: italic;font-size: 10px;\"><button class=\"btn "+buttoncolor+" btn-xs\" onclick=\"verAlerta("+alertas[i].idcliente+")\" ><p style=\"font-style: italic;font-size: 10px;\">Ver Alerta <span class=\"glyphicon glyphicon-search\"></span></p></button></td>";
+			code +="</tbody></table></div>";
+			
+		}
+ 	}
+	else
+	{
+		code='<div class=\"alert alert-success\" role=\"alert\">';
+	}
+	//NO FUNCIONA POR AHORA.
+	$(".ui-dialog-titlebar").val("Alertas do Dia: <span class=\"badge\">42</span>");
+	return code;
+}   
+function verAlerta(ide)
+{
+	
+	window.location.replace("/procuraporid_cliente_credito?id="+ide);
+}
+function loadDialogAlerts()
+{
+
+	$("#meu-dialog").append(loadingAlertsCode())
+      .dialog({
+       "title" : "Alertas do Dia!"
+        
+       })
+      .dialogExtend({
+        "closable" : false,
+        "maximizable" : false,
+        "minimizable" : true,
+        "collapsable" : false,
+        "dblclick" : "collapse",
+      
+        "minimizeLocation" : "right",
+       
+        "icons" : {
+          
+          "maximize" : "ui-icon-circle-plus",
+          "minimize" : "ui-icon-circle-minus",
+          "restore" : "ui-icon-newwin"
+        },
+        "load" : function(evt, dlg){  $('#meu-dialog').dialog({position: {my: 'right bottom', at: 'right bottom', of: window}}); },
+        "beforeCollapse" : function(evt, dlg){ },
+        "beforeMaximize" : function(evt, dlg){  },
+        "beforeMinimize" : function(evt, dlg){$('#meu-dialog').dialog({position: {my: 'right bottom', at: 'right bottom', of: window}}); },
+        "beforeRestore" : function(evt, dlg){  $('#meu-dialog').dialog({position: {my: 'right bottom', at: 'right bottom', of: window}}); },
+        "collapse" : function(evt, dlg){  },
+        "maximize" : function(evt, dlg){  },
+        "minimize" : function(evt, dlg){  },
+        "restore" : function(evt, dlg){ $('#meu-dialog').dialog({position: {my: 'right bottom', at: 'right bottom', of: window}});}
+      })
+     ;	
+		
+}
+
+$( window ).scroll(function() {
+		switch ( $("#my-dialog").dialogExtend("state") ) {
+		  case "maximized":
+		    alert("The dialog is maximized");
+		    break;
+		  case "minimized":
+		    alert("The dialog is minimized");
+		    break;
+		  case "collapsed":
+		    alert("The dialog is collapsed");
+		    break;
+		  default:
+		   $('#meu-dialog').dialog({position: {my: 'right bottom', at: 'right bottom', of: window}});
+		}
+});
+
+//dialog de Relatorio
+function addCodeForRelatorioButton()
+{
+	var code = "";
+	
+	code +=" <h6 style=\"text-align:center;\"> <b>Data Inicio</b></h6>";
+	code +="<input  style=\"text-align:center;display:inline;\"type=\"text\"  id=\"datainicio_relatorio\">";
+	code +=" <h6 style=\"text-align:center;\"> <b>Data Final</b></h6>";
+	code +="<input  style=\"text-align:center;display:inline;\" type=\"text\"   id=\"datafinal_relatorio\" /><br>";
+	code +="<button  onclick=\"botaoRelatorio()\" class=\"btn btn-primary btn-xs pull-right\">Baixar <i class=\"glyphicon glyphicon-download\"></i></button>";
+	
+	
+	
+	
+	return code;
+}
+
+function iniciarDataInicio()
+{
+	 $('#datainicio_relatorio').datepicker({
+				format: 'dd/mm/yyyy',
+				 widgetPositioning: 'up'
+			});
+	var nowTemp = new Date();
+	var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+	 
+	var checkin = $('#datainicio_relatorio').datepicker({
+		options: {widgetPositioning: 'up'},
+	  onRender: function(date) {
+	    return date.valueOf() < now.valueOf() ? 'disabled' : '';
+	  }
+	}).on('changeDate', function(ev) {
+	  
+	  checkin.hide();
+	}).data('datepicker');
+	
+}
+
+function iniciarDataFinal()
+{
+	 $('#datafinal_relatorio').datepicker({
+				format: 'dd/mm/yyyy'
+			});
+	var nowTemp = new Date();
+	var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+	 
+	var checkin = $('#datafinal_relatorio').datepicker({
+	  onRender: function(date) {
+	    return date.valueOf() < now.valueOf() ? 'disabled' : '';
+	  }
+	}).on('changeDate', function(ev) {
+	  
+	  checkin.hide();
+	}).data('datepicker');
+}
+$(function(){
+    $("#botao_relatorio").on("click",function(){
+    
+    
+    
+        if(!$("#m1").length){
+            $(this).after($("<div>",{id: "m1", style:"display:inline;position:relative;top:40px;"}).addClass("c12"));
+            $("#m1").html('<div class=\"testingarea\"></div><div class=\"abc\">'+addCodeForRelatorioButton()+'</div>');
+            $("#m1").show("fade",1000);
+            iniciarDataInicio();
+			iniciarDataFinal();
+        }
+        else{
+            $("#m1").toggle();
+        }
+    });
+/* This is for mouseout functionality - use only when required.*/
+    $("#m1").on("mouseout",function(){
+        $("#m1").remove();
+    });
+    
+});
+
+
+</script>
+	
+</html>

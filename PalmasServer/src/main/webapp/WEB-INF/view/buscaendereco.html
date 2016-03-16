@@ -1,0 +1,395 @@
+!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+  <head>
+		  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+		 <!-- VersiÃ³n compilada y comprimida del CSS de Bootstrap -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+ 
+<!-- Tema opcional -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+ <script src="/js/bootstrap-datepicker.js"></script>
+ <link href="/css/datepicker.css" rel="stylesheet">
+<!-- VersiÃ³n compilada y comprimida del JavaScript de Bootstrap -->
+			<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+			<meta charset="ISO-8859-1">
+		    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+		    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<style type="text/css">
+	.bg {
+ 
+  position: fixed;
+  width: 1140px;
+  height: 350px; /*same height as jumbotron */
+  
+  background-position:center top;
+  z-index: -1;
+}
+body
+	{
+	background: url('/img/fundo.png');
+	background-repeat: repeat;
+	background-size: 20% 15%;
+	}
+#title_jumbotron {
+  height: 250px;
+  color: white;
+  text-shadow: #444 0 1px 1px;
+  
+  background-size: 100% 100%;
+  background: url('/img/capa.png');
+}
+#mapa
+{
+	float: left;
+    width:100%;
+    height:567px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px; 
+    border:1px solid #666;
+    margin-bottom:1em;
+    box-shadow: 0px 0px 10px #333;
+}
+#buscador
+	{
+		margin-top: -20px;
+		position:absolute;
+		float:center;
+		margin-left: 450px;
+		
+	}	
+	#buscador2
+	{
+		margin-top: -20px;
+		position:absolute;
+		float:center;
+		margin-left: 700px;
+	}
+.info{
+	font-size: 0.875em;
+}
+	
+</style>	 
+ <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+  <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
+  <script src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
+</head>
+  
+  <body role="document" th:inline="text">
+		<!-- Navbar -->
+		
+		<nav class="navbar navbar-inverse navbar-fixed-top" >
+		    <div class="container">
+		        <div class="navbar-header">
+		            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+		                <span class="sr-only">Toggle navigation</span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		            </button>
+		           
+		        </div>
+		        <div id="navbar"  class="navbar-collapse collapse">
+		             <ul class="nav navbar-nav navbar-left">
+		                <a class="navbar-brand" href="#" >Busca de Cliente por Endereco</a>
+		                <li th:classappend="${page == 'home' ? 'active' : ''}"><a href="#" th:href="@{/index}">Voltar ao Mapa</a></li>
+		                
+		                 <li id="buscador">
+			                <form class="navbar-form" role="search" name="search-form" action="#" th:action="@{'/procuraporid_cliente_credito'}" th:object="${seguimento_cliente}" method="post">>
+							        	<div class="input-group">
+								            <input type="text" class="form-control" th:field="*{novo_seguimento}" placeholder="Procura de Cliente por ID" id="query" name="query" value="">
+									           
+								            		<button type="submit" class="btn btn-success"><i class="glyphicon glyphicon-search"></i></button>
+								            	
+								        </div>
+						    </form>
+						</li>  
+						<li id="buscador2">
+						<form class="navbar-form" role="search" name="search-form"  th:target="_blank"  action="#" th:action="@{'/procuraporendereco'}" th:object="${Buscaendereco}" method="post">>
+							        	<div class="input-group">
+								            <input type="text" class="form-control" th:field="*{endereco}" placeholder="Escreva o nome da Rua" id="query" name="query" value="">
+									            
+								            		<button type="submit" class="btn btn-success"><i class="glyphicon glyphicon-search"></i></button>
+								            	
+								        </div>
+						    </form>
+						</li>   
+		          	</ul>
+		           	
+		          
+		            <ul class="nav navbar-nav navbar-right">
+		                <li th:if="${#authorization.expression('!isAuthenticated()')}"><a href="/signin" th:href="@{/signin}">Sign in</a></li>
+		                <li th:if="${#authorization.expression('isAuthenticated()')}"><a href="/logout" th:href="@{/logout}">Logout</a></li>
+		            </ul>
+		        </div>
+		        <!--/.nav-collapse -->
+		    </div>
+		</nav>
+		
+		 <div class="container theme-showcase"  role="main">
+		
+		      <!-- Main jumbotron for a primary marketing message or call to action -->
+		      <div class="bg" id="bgid">
+		      </div>
+			  <div class="jumbotron" id="title_jumbotron">
+			        <h1 style='text-align:center; margin-top:60px;text-shadow: 2px 2px #000000; '>Busca de Enderecos</h1>
+			        
+			  </div>
+			  <div class="page-header">
+			  	<h1 id="title"></h1>
+				  <div class="row">
+				  	<div class="col-md-6">
+										
+											<div id="mapa">
+											
+											</div>
+										
+					</div>
+					<div class="col-md-6">
+										
+											<div class="jumbotron" id="table_busca">
+											</div>
+										
+					</div>
+				</div>
+		</div>
+	</div>
+<script th:inline="javascript" type="text/javascript">
+var clientes = [[${clientes}]];
+var logradouro = [[${logradouro}]];
+
+LoadMapa(WithoutLiquidado(clientes));
+TableCreation(WithoutLiquidado(clientes));
+
+function TableCreation(clientess)
+{
+
+ 	var code = '<div class=\"panel panel-success\">';
+ 	code += '<div class=\"panel-heading\"><span class=\"badge badge-info\" >'+clientess.length + '</span> Coincidencias (com Perdas)</div>';
+  	code += '<div class=\"panel-body\">';
+	code += '<table class=\"table table-hover\">';
+	code += '<thead >';
+	code += '<tr ><td>Nome</td><td>Endereço</td><td>Saldo Devedor</td></tr>';
+	code += '</thead >';
+	code += '<tbody>';
+	for( var i=0;i<clientess.length;i++)
+	{
+		code +='<tr onclick=\"ClickClient('+clientess[i].codigocliente+')\" style=\"font-size:10px\"><td>'+clientess[i].nome_cliente+'</td><td>'+clientess[i].endereco+'</td><td>'+clientess[i].saldo_devedor[clientess[i].saldo_devedor.length-1]+'</td></tr>';
+	}
+	code += '</tbody></table>';
+  	code += '</div>';
+    code += '<div class=\"panel-footer\">Nota:Senão aparecerem todos os clientes no Mapa, é porque Google Maps não achou o Endereço.</div>';
+  	
+  	
+  	
+  	$('#table_busca').html(code);
+}
+
+function ClickClient(hola)
+{
+	window.open("/procuraporid_cliente_credito?id="+hola);
+}
+function WithoutLiquidado(clientess)
+{
+	var clientes_without = new Array();
+	for (var i=0; i<clientess.length;i++)
+	{
+		for(var j=0;j<clientess[i].situacao.length;j++)
+		{
+			
+			if(clientess[i].situacao[j] == 'PERDA')
+			{
+				
+				clientes_without.push(clientess[i]);
+			}
+		}
+	}
+	$('#title').html('<span class=\"badge badge-info\" style=\"font-size:30px; margin-top:-10px;\">'+clientes_without.length + '</span> Coincidencias para Logradouro:'+ logradouro);
+	return clientes_without;
+}
+function LoadMapa(value)
+{
+	
+	initialize(value);
+  
+     
+// google.maps.event.addDomListener(window, 'load', initialize);
+
+}
+   function abrirInfoBox(id, marker) {
+	   
+			if (typeof(idInfoBoxAberto) == 'number' && typeof(infoBox[idInfoBoxAberto]) == 'object') {
+				infoBox[idInfoBoxAberto].close();
+			}
+			infoBox[id].open(map, marker);
+			idInfoBoxAberto = id;
+		}
+		
+function initialize(value) {
+   		
+   	
+   
+   		
+   		var idInfoBoxAberto;
+		var infoBox = [];
+        var mapCanvas = document.getElementById('mapa');
+        
+        var mapOptions = {
+          center: new google.maps.LatLng(-3.7280,-38.5303),
+          zoom: 12,
+          mapTypeId: google.maps.MapTypeId.ROADMAP
+        }
+        
+        var map = new google.maps.Map(mapCanvas, mapOptions);
+    	var latlngbounds = new google.maps.LatLngBounds();
+    	var markers = [];
+    	var contador = 0;
+    	var MaxSize = 0;
+    	$.each(value, function(i,e) {
+	    	
+	    		if(e.gps_position_updated == true)
+	    		{
+	    			MaxSize++;
+	    		}
+	    	
+	    });	
+	    
+		 $.each(value, function(i,e) {
+		 //TEXT BOX CUSTOMIZATION     
+		 	if(e.gps_position_updated == true)
+		 	{
+		 	contador++;
+		       																						
+            var BoxElements = "<h4  font-weight: bold; text-align:center;>"+e.nome_cliente + "</h4><br>" + "Tipo de Risco:"+e.risco + "<br>" + "SituaÃ§Ã£o:"+e.situacao+ "<br>" + "EndereÃ§o:"+e.endereco+ "<br>" + "Fone:"+e.fone+"<br>" ;
+           
+           
+//OBTAINING IMAGES_pATH_LIST:
+			var image_url = "get_images_path/"+e.id;
+			 
+			var imagesLoaded = false;	
+//BUILDING THE HIPERLINK			
+			var hiperLink =  "<a href=\"cliente_credito/?id="+e.id+"\" target=\"_blank\">Mais InformaÃ§Ã£o</a>" ;	
+			
+			var pinColor;
+			var isPerda = false;
+			var isAtivo = false;
+			var isLiquidado = false;
+			
+			for(var y = 0; y < e.situacao.length ; y++)
+			{
+				if(e.situacao[y] == "PERDA")
+				{
+					isPerda = true;
+					detetado = true;
+					
+				}
+			}	
+			
+				
+			if(!isPerda)
+			{
+				for(var y = 0; y < e.situacao.length ; y++)
+				{
+					if(e.situacao[y] == "ATIVO")
+					{
+						isAtivo = true;
+						detetado = true;
+						
+					}
+				}
+			}
+			if(!isPerda && !isAtivo)
+			{
+				isLiquidado = true;
+			}
+			
+			
+			if(isPerda)
+			{
+				pinColor = "FF0000";
+			}
+			else if(isAtivo)
+			{
+				pinColor = "F7FE2E";
+			}
+			else
+			{
+				pinColor = "00FF00";
+			}
+					
+			var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + pinColor,
+						    new google.maps.Size(21, 34),
+						    new google.maps.Point(0,0),
+						    new google.maps.Point(10, 34));
+			
+			   marker = new google.maps.Marker({
+                map: map,
+                draggable: true,
+                position: new google.maps.LatLng(new Number(e.latitude), new Number(e.longitude)),
+                title: e.nome_cliente[0],
+                visible: true,
+                icon: pinImage
+            }),
+            boxText = document.createElement("div"),
+            //these are the options for all infoboxes
+            myOptions = {
+                 content: boxText,
+                disableAutoPan: false,
+                maxWidth: 0,
+                pixelOffset: new google.maps.Size(-140, 0),
+                zIndex: null,
+                boxStyle: {
+                    background: "url('http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/examples/tipbox.gif') no-repeat",
+                    opacity: 0.75,
+                    width: "280px"
+                },
+                closeBoxMargin: "12px 4px 2px 2px",
+                closeBoxURL: "http://www.google.com/intl/en_us/mapfiles/close.gif",
+                infoBoxClearance: new google.maps.Size(1, 1),
+                isHidden: false,
+                pane: "floatPane",
+                enableEventPropagation: false
+            };
+            
+   			//define the text and style for all infoboxes
+            boxText.style.cssText = " border: 1px solid black; margin-top: 8px; background:#333; color:#FFF; font-family:Arial; font-size:12px; padding: 5px; border-radius:6px; -webkit-border-radius:6px; -moz-border-radius:6px;";
+            
+	
+			BoxElements = BoxElements + hiperLink;
+			
+			boxText.innerHTML = BoxElements;
+		    infoBox[new Number(e.id)] = new InfoBox(myOptions);
+        	
+			infoBox[new Number(e.id)].marker = marker;
+			
+			var ib = new InfoBox(myOptions);
+	
+			google.maps.event.addListener(marker, "click", function (e) {
+			boxText.innerHTML = BoxElements ;
+			  ib.open(map, this);  // change the map variable appropriately
+		
+			});
+			
+		markers.push(marker);
+		latlngbounds.extend(marker.position);
+		
+			if(contador == MaxSize)
+		 	{
+		 		var markerCluster = new MarkerClusterer(map, markers);
+				map.fitBounds(latlngbounds);
+				
+			}
+		
+		
+    		} //	CIERRO EL IF DE LOS GPS_UPDATED
+			});//CIERRA EACH PRINCIPAL DE CADA PUNTO
+ 	
+		 	google.maps.event.addListenerOnce(map, 'idle', function(){
+		   
+		});
+			
+}
+</script>
+</body>
+
+</html>											

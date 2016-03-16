@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Manage Media!</title>
+ <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js""></script>
+</head>
+<body>
+
+<div id=container> Add new photo!
+<form id="myform"  action="#"  th:action="@{'/upload'(id=${id_local})}" th:object="${Images}" method="POST" modelAttribute="Images"  enctype="multipart/form-data">
+	<input type="file"   th:field="${Images.image}"  name="file"/>
+    <input type="submit" value="Upload"/>
+</form>
+
+
+
+<table id="table" border="5" cellspacing="5" cellpadding="5" width="50%">
+<tr>
+	<td>
+	IMAGES CONFIGURATION!
+	</td>
+</tr>
+<tr th:each="images_pat,row : ${images_path}" >
+	<td>
+	    <img class="picture" th:src="@{/image/(id=${images_path[row.index]})}" style="width: 150px; height: 150px;"/>
+	      <form action="#" th:action="@{/delete_image/(id=${images_path[row.index]})}"  method="post">
+           <button type="submit">Delete</button>
+        </form>
+	</td>
+</tr>
+<tr>
+	<td>
+	YOUTUBE LINK CONFIGURATION!
+	</td>
+</tr>
+
+<tr th:each="youtube_link,row : ${youtube_links}" >
+	<td>
+	    <input type="text"   class="youtube_link" name="link" th:value="${youtube_links[row.index]}"   size="60"/>
+    </td>
+</tr>
+
+<tr>
+	<td>
+		<input type="button" id="upload_youtube_links" onclick="upload_youtube_linkss()" value="Update existing YoutubeLinks"/>
+	</td>
+</tr>
+	
+<tr>
+	<td>
+		<input type="text" class="add_youtube_link" th:id="${id_local}"  size="60"/>
+		<input type="button" id="upload_youtube_links" onclick="add_youtube_link()" value="Add new Youtube Link"/>
+	</td>
+</tr>
+	
+ </table>
+</div>
+</body>
+	<script>
+	function add_youtube_link()
+	{
+	
+	var url2 = "/add_youtube_link/"+$(".add_youtube_link").attr('id')+"/"+$(".add_youtube_link").val().replace(/\//g,"_").replace(/\./g,",").replace(/\?/g,"-");
+	alert(url2);
+	 $.getJSON(url2, function (data) {
+	//  window.location = "redirect_media/"+$(".add_youtube_link").attr('id');
+         });
+		
+		
+	}
+	$( ".delete_button" ).click(function() {
+	
+	var url = "delete_image/?id="+$(this).attr("id");
+	 alert(url);
+	 $.getJSON(url, function (data) {
+	    
+        	
+         });
+	});
+	
+	function upload_youtube_linkss()
+	{
+		var json = "";
+	$(".youtube_link").each(function(value){
+		json += $(this).val()+";";
+	    
+		});
+	alert(json);
+	
+		var url = "upload_youtube_links/?id="+$(this).attr("id");
+		 alert(url);
+	 $.getJSON(url, function (data) {
+	    
+        	
+         });
+	}
+	
+	
+	
+	</script>
+</html>

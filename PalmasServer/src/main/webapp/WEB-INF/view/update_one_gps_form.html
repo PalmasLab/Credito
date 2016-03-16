@@ -1,0 +1,152 @@
+!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+ <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+		 <!-- VersiÃ³n compilada y comprimida del CSS de Bootstrap -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+ 
+<!-- Tema opcional -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+ 
+<!-- VersiÃ³n compilada y comprimida del JavaScript de Bootstrap -->
+			<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+			
+		    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+		    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+	
+  <style>
+	  #mapa{
+		float: right;
+	    width:100%;
+	    height:200px;
+	    -webkit-border-radius: 5px;
+	    -moz-border-radius: 5px;
+	    border-radius: 5px; 
+	    border:1px solid #666;
+	    margin-bottom:1em;
+	    box-shadow: 0px 0px 10px #333;
+		}
+  
+  body
+	{
+	background: url('/image_background/?id=fundo.png');
+	background-repeat: repeat;
+	background-size: 20% 20%;
+	}
+  
+ 
+  
+  </style>  
+</head>
+<body role="document" th:inline="text">
+		<!-- Navbar -->
+		
+		<nav class="navbar navbar-inverse navbar-fixed-top" >
+		    <div class="container">
+		        <div class="navbar-header">
+		            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+		                <span class="sr-only">Toggle navigation</span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		            </button>
+		           
+		        </div>
+		        <div id="navbar"  class="navbar-collapse collapse">
+		             <ul class="nav navbar-nav navbar-left">
+		                <a class="navbar-brand" href="#" >Modificar posiçao GPS</a>
+		                <li th:classappend="${page == 'home' ? 'active' : ''}"><a href="#" th:href="@{/index}">Voltar ao Mapa</a></li>
+		                
+		          	</ul>
+		           	
+		          
+		            <ul class="nav navbar-nav navbar-right">
+		                <li th:if="${#authorization.expression('!isAuthenticated()')}"><a href="/signin" th:href="@{/signin}">Sign in</a></li>
+		                <li th:if="${#authorization.expression('isAuthenticated()')}"><a href="/logout" th:href="@{/logout}">Logout</a></li>
+		            </ul>
+		        </div>
+		        <!--/.nav-collapse -->
+		    </div>
+		</nav>
+		 <div class="container theme-showcase"  role="main">
+		 	
+		 		<div class="row" style="position : fixed; margin-top:50px;">
+			 		<div class="col-md-8">
+				 		<div class="jumbotron">
+					 		<form id="editing_question_survey" action="#" th:action="@{'/mudar_position_gps'}" th:object="${mudar_position_gps}" method="post">
+						    	
+						       		<div class="col-sm-2"><label for="First_Name">Codigo Cliente:</label><input type="text"  th:field="*{id}" /></div>
+						       		<div class="col-sm-2"><label for="First_Name">Latitude:</label><input type="text"  th:field="*{latitude}" /></div>
+						       		<div class="col-sm-2"><label for="First_Name">Longitude:</label><input type="text"  th:field="*{longitude}" /></div>
+					        		<div class="col-sm-2"><label for="First_Name">Endereço:</label><input type="text"  th:field="*{ende}" /></div>
+						        <input type="submit" value="Atualizar"  class="btn btn-sm btn-success"/> 
+						    </form>
+							<br>
+						    <a href="http://www.gps-coordinates.net/" target="_blank">Pega as Coordenadas nesse site!</a>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div id="mapa"></div>
+					</div>
+				</div>
+		 		<div class="row" >
+		 			<div class="jumbotron">
+		 				<table class="table table-striped"style=" margin-top:260px;" >
+													<thead>
+														
+														<th>Codigo Cliente</th>
+														<th>Logradouro</th>
+														<th>Bairro</th>
+														<th>Cidade</th>
+														<th>CEP</th>
+														
+													</thead>
+														<tbody >
+														
+															<tr>
+																<td th:if="${not #lists.isEmpty(cliente.codigo_cliente)}"">[[${cliente.codigo_cliente[0]}]]</td>
+																<td th:if="${#lists.isEmpty(cliente.codigo_cliente)}"">Valor Vazio</td>
+																<td th:if="${not #lists.isEmpty(cliente.endereco)}"">[[${cliente.endereco[0]}]]</td>
+																<td th:if="${#lists.isEmpty(cliente.endereco)}"">Valor Vazio</td>
+																<td th:if="${not #lists.isEmpty(cliente.bairro)}"">[[${cliente.bairro[0]}]]</td>
+																<td th:if="${#lists.isEmpty(cliente.bairro)}"">Valor Vazio</td>
+																<td th:if="${not #lists.isEmpty(cliente.cidade)}"">[[${cliente.cidade[0]}]]</td>
+																<td th:if="${#lists.isEmpty(cliente.cidade)}"">Valor Vazio</td>
+																<td th:if="${not #lists.isEmpty(cliente.CEP)}"">[[${cliente.CEP[0]}]]</td>
+																<td th:if="${#lists.isEmpty(cliente.CEP)}"">Valor Vazio</td>
+															</tr>
+														
+														
+														</tbody>
+												</table>
+		 			</div>
+		 		</div>
+		 </div>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script th:inline="javascript" type="text/javascript">
+    var cliente = [[${cliente}]];
+    
+    
+//MAPPPPPPPPPPPPPPPPPPPPPPP
+			var map;
+		function initialize() {
+		  var mapOptions = {
+		    zoom: 15,
+		    center: new google.maps.LatLng(new Number(cliente.latitude), new Number(cliente.longitude))
+		  };
+		  map = new google.maps.Map(document.getElementById('mapa'),
+		      mapOptions);
+		       var marker = new google.maps.Marker({
+      position:new google.maps.LatLng(new Number(cliente.latitude), new Number(cliente.longitude)),
+      map: map,
+      title: 'Cliente'
+  });
+		}
+		
+		google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+</body>
+</html>

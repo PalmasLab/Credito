@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+  <head>
+		  <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+		 <!-- Versión compilada y comprimida del CSS de Bootstrap -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css">
+ 
+<!-- Tema opcional -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap-theme.min.css">
+ 
+<!-- Versión compilada y comprimida del JavaScript de Bootstrap -->
+			<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+			<meta charset="ISO-8859-1">
+		    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+		    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<style type="text/css">
+	.bg {
+ 
+  position: fixed;
+  width: 1140px;
+  height: 350px; /*same height as jumbotron */
+  
+  background-position:center top;
+  z-index: -1;
+}
+
+.jumbotron {
+  height: 350px;
+  color: white;
+  text-shadow: #444 0 1px 1px;
+  background:transparent;
+}
+
+.info{
+	font-size: 0.875em;
+}
+  	
+</style>	 
+</head>
+  
+  <body role="document" th:inline="text">
+		<!-- Navbar -->
+		
+		<nav class="navbar navbar-inverse navbar-fixed-top" >
+		    <div class="container">
+		        <div class="navbar-header">
+		            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+		                <span class="sr-only">Toggle navigation</span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		                <span class="icon-bar"></span>
+		            </button>
+		            <a class="navbar-brand" href="#" th:text="${project.project_name}">My Project</a>
+		        </div>
+		        <div id="navbar"  class="navbar-collapse collapse">
+		            <ul class="nav navbar-nav">
+		                <li th:classappend="${page == 'home' ? 'active' : ''}"><a href="#" th:href="@{/}">Home</a></li>
+		                <li th:classappend="${page == 'Ajuda' ? 'active' : ''}"><a href="#" th:href="@{/message}">Ajuda</a></li>
+		                <li th:classappend="${page == 'Questionario' ? 'active' : ''}"><a href="#" th:href="@{/task}">Questionario</a></li>
+		                <li th:classappend="${page == 'Fotos' ? 'active' : ''}"><a href="#" th:href="@{/task}">Fotos</a></li>
+		                <li th:classappend="${page == 'Videos' ? 'active' : ''}"><a href="#" th:href="@{/task}">Videos</a></li>
+		            </ul>
+		            <ul class="nav navbar-nav navbar-right">
+		                <li th:if="${#authorization.expression('!isAuthenticated()')}"><a href="/signin" th:href="@{/signin}">Sign in</a></li>
+		                <li th:if="${#authorization.expression('isAuthenticated()')}"><a href="/logout" th:href="@{/logout}">Logout</a></li>
+		            </ul>
+		        </div>
+		        <!--/.nav-collapse -->
+		    </div>
+		</nav>
+		
+		 <div class="container theme-showcase"  role="main">
+		
+		      <!-- Main jumbotron for a primary marketing message or call to action -->
+		      <div class="bg" id="bgid">
+		      </div>
+			  <div class="jumbotron" id="title_jumbotron">
+			        <h1 th:text="${local.nome_posto_saude}">Nome do Local</h1>
+			        <p th:text="${local.descricao}">Aqui ira a informacao de cada local blablabalbbalbalblaablalbal</p>
+			  </div>
+			  
+			 <div class="page-header">
+				<h1>Informação</h1>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="jumbotron" >
+								<p class="info" >Nome: [[${local.nome_posto_saude}]]</p>
+								<p class="info" >Endereço: [[${local.endereco}]]</p>
+									<div th:each="parametro,row1  : ${project.Lista}">
+									<p class="info">[[${parametro.pergunta}]]: [[${parametro.rrespostas[${local.lista_respostas[__${row1.index}__].index}]}]]   </p>
+										
+									</div>
+							</div>
+						</div>
+					</div>
+			 </div>
+		
+				<div class="page-header">
+					<h1>Questionário</h1>
+						<div th:each="surv,row1  : ${survey}">
+							<div class="row">
+								<h4 th:text="${surv.pergunta}"></h4>
+								<div class="col-md-6">
+									<table class="table table-striped" >
+										<thead>
+											<tr>
+												<th>#</th>
+												<th>Resposta</th>
+												<th>Nº pessoas escolheram essa resposta</th>
+											</tr>
+										</thead>
+											<tbody th:id="answers_table+${row1.index}">
+												
+											</tbody>
+									</table>
+									
+									
+								</div>
+									<div class="col-md-6">
+										<div th:id="'piechart_3d'+${row1.index}" ></div>
+									</div>	
+							</div>
+						</div>	
+				</div>
+		</div>
+		
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script th:inline="javascript" type="text/javascript">
+    var jumboHeight = $('.jumbotron').outerHeight();
+	function parallax()
+	{
+	    var scrolled = $(window).scrollTop();
+	    $('.bg').css('height', (jumboHeight-scrolled) + 'px');
+	}
+
+	$(window).scroll(function(e){
+	    parallax();
+	});
+    
+    var local = [[${local}]];
+    var survey = [[${survey}]];
+    var parametro = [[${project.Lista}]];
+    google.load("visualization", "1", {packages:["table","corechart"]});
+	google.setOnLoadCallback(function(){drawChart()});
+	
+	function drawChart() 
+	{
+		for(var i=0; i<survey.length;i++)
+   		{ 	
+		  	//INITIALIZING ARRAY
+			var data = new google.visualization.DataTable();
+        	data.addColumn('string', 'Topping');
+        	data.addColumn('number', 'Slices');
+        	data.addRows(survey[i].rrespostas.length);
+			
+			var AnswerCounter = 0;
+		      	for(var j=1;j<survey[i].rrespostas.length;j++)
+		        {
+		        	for(var u=0;u<local.list_completed_survey.length;u++)
+		        	{
+		        	//Comparo respuesta y si, sumo
+		        		if(local.list_completed_survey[u].answer[i] == j )
+		        		{
+		        			AnswerCounter++;
+		        		}
+		        	}
+		        	data.setCell(j,0,survey[i].rrespostas[j]);
+		        	data.setCell(j,1,AnswerCounter);
+		         }
+	          	
+	       	var titulo_pergunta = 'Pergunta '+i+' '+survey[i].pergunta;   	
+	       	var div_chart = 'piechart_3d'+i;
+			var options = {
+	          title: titulo_pergunta,
+	          is3D: true,
+	        };
+	        var chart = new google.visualization.PieChart(document.getElementById(div_chart));
+	        chart.draw(data, options);
+	      }
+	}
+	
+//BUILDING ANSWERS_TABLE!!
+	answers_table();
+//	ChangeBackgroungImageOfTab("bgid","");
+	function settingImageBackground()
+	{
+	//OBTAINING IMAGES_pATH_LIST:
+	var image_url = "/get_images_path/"+local.id;
+	var imagesLoaded = false;
+	$.getJSON(image_url,function(data1,innerData)
+	{
+		for( var y=0;  y<1 ;y++)
+		{
+			if(typeof data1[y] != "undefined")
+			{   
+			ChangeBackgroungImageOfTab("bgid","image/?id="+data1[y]);                                                               
+			
+			imagesLoaded = true;
+			}
+		}
+	});	
+	
+	}
+	function answers_table()
+	{
+	for(var i=0; i<survey.length;i++)
+   		{ 	
+   		
+		      	for(var j=1;j<survey[i].rrespostas.length;j++)
+		        {
+		        var AnswerCounter = 0;
+		        	for(var u=0;u<local.list_completed_survey.length;u++)
+		        	{
+		        	//Comparo respuesta y si, sumo
+		        		if(local.list_completed_survey[u].answer[i] == j )
+		        		{
+		        			AnswerCounter++;
+		        		}
+		        	}
+		        	$('#answers_table'+i).append('<tr> <td>'+j+'</td><td>'+survey[i].rrespostas[j]+'</td> <td>'+AnswerCounter+'</td> </tr> ');
+		         }
+		}
+	}
+	settingImageBackground();
+function ChangeBackgroungImageOfTab(tabName, imagePrefix)
+{
+    document.getElementById(tabName).style.backgroundImage = "url(/" + imagePrefix+")";
+}
+</script>
+</body>
+</html>

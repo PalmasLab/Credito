@@ -1,0 +1,220 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Correcting</title>
+<style>
+html, body {
+width:100%;
+height:100%;
+margin:0;
+background: gray;
+}
+p {
+    color: white;
+    margin: 5px;
+    cursor: pointer;
+    float: left;
+    margin: auto;
+    width:20%;
+    left: 50%;
+    text-align:center;
+  }
+
+ p:hover {
+    background: gray;
+    color: #83C24A;
+  }
+  p:focus
+  {
+  color:#83C24A;
+  }
+</style>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
+
+</head>
+<body>
+<div id="container" >Escolha um mapa</div>
+<br>
+ <table id="table" border="5" cellspacing="5" cellpadding="5" width="50%">
+ <tr id="titulos"></tr>
+ </table>
+ <script>
+ //LOADING CLIENTS
+
+loadingClients();
+var ProjectsLoaded = false;
+var TableLoaded = false;
+var projectName = "";
+var Project_id = 0;
+
+	function loadingClients(){
+	 $('#container').html('<li >Clientes!');
+	 	$.getJSON('getclients', function(value) {
+			
+			$.each(value, function(i,e){
+			
+			$('#container').append('<p class=\"clients\">'+e.logginname +"</p>");
+			
+				
+			});
+		
+		});
+		 $('#container').append('</li>');
+	}
+
+//ADDING NEW LISTENER ON CLIENTS	 
+	  $('#container').on("click", "p.clients" ,function() {
+		  if(!ProjectsLoaded)
+		  {
+		    
+			LoadProjectList($(this).text());
+			ProjectsLoaded = true;
+		  }
+		  else
+		  {
+		   	alert('Projetos já carregamos. Escolha um deles.');
+		  }
+	  });	
+	  
+	  $('#container').on("click", "p.projeto" ,function() {
+	  if(!TableLoaded)
+	  {
+	  		projectName = $(this).text();
+	  		Project_id = $(this).attr('id');
+	  		LoadTitleTableProject();
+			TableLoaded = true;
+	  }
+	  else
+	  {
+	  	alert('A tabela já foi carregada.Se quiser carregar outra, reinicie a pagina.');
+	  }
+	  });	
+	
+	$('#table').on("click", "button",function() {
+	
+		if($(this).attr('class')=='update_button')
+		{
+		launchUpdate($(this).val());
+		}
+		else if($(this).attr('class') == 'media_button')
+		{
+		
+		}
+		
+});	  
+
+	  
+	function LoadProjectList(cliente)
+	{
+
+		$('#container').append("<br> <li > Projetos ");
+		$.getJSON('getListaMapas/'+cliente,function(value ) {
+
+				$('#container').append("<p class=\"projeto\" id=\""+value.id+"\">" +value.project_name+"</p> <button type=\"button\" onclick=\"goEditSurvey("+ value.id +")\" class=\"edit_survey\" value=\""+value.id +"\" >Edit Survey</button> <button type=\"button\" onclick=\"goEditParameters("+ value.id +")\" class=\"edit_parameters\" value=\""+value.id +"\" >Edit Parameters</button>" );
+		}); 
+		
+		$('#container').append("</li>");	
+		
+	}  
+	
+	function LoadTitleTableProject()
+	{
+	$.getJSON('getproject/admin/'+projectName, function(value) {
+	var firstTime =true;
+	var lastTime = 0;
+			$.each(value.lista, function(i){
+				if(firstTime)
+				{
+					$('#titulos').append( '<th>Update</th> <th>id</th>   <th>Nome Local</th> <th>Description</th> <th>Latitude</th> <th>Longitude</th> <th>Endereço</th>   <th>BairroMunicipio</th> <th>Cidade</th>   <th>Estado</th> <th>Pais</th>' );
+					firstTime = false;
+					
+				}
+				lastTime = lastTime + 1;
+				$('#titulos').append(' <th>'+(i+1)+"."+value.lista[i].pergunta +"</th>");
+				if(lastTime == value.lista.length)
+				{
+					LoadContentTableProject();
+				}
+			});
+	});  
+	
+	
+	}
+	
+	
+	function LoadContentTableProject()
+	{
+			
+		 $.getJSON('getanswersfromaproject/admin/'+Project_id, function (value) {
+	      if(value == "")
+	      {
+	      alert("Não existem locales com as combinações de respostas escolhidas.");
+	      }
+	      else{
+	      
+	      $.each(value, function(i,e) {
+	     		
+	      		var row = "<tr> <td ><button type=\"button\" class=\"update_button\" value=\""+e.id +"\" >Update</button></td>   <td >"+e.id+"</td><td class=\"r"+e.id+"\"><input type=\"text\" name=\"nome_posto_saude\" value=\""+e.nome_posto_saude+"\"></td> <td class=\"r"+e.id+"\"><textarea  name=\"descricao\"  cols=\"40\" rows=\"4\">"+e.descricao+"</textarea></td> <td class=\"r"+e.id+"\"><input type=\"text\" name=\"latitude\" value=\""+e.latitude+"\"></td> <td class=\"r"+e.id+"\"><input type=\"text\" name=\"longitude\" value=\""+e.longitude+"\"></td><td class=\"r"+e.id+"\"><input type=\"text\" name=\"endereco\" value=\""+e.endereco+"\"></td><td class=\"r"+e.id+"\"><input type=\"text\" name=\"barrio_ou_nome_municipio\" value=\""+e.barrio_ou_nome_municipio+"\"></td><td class=\"r"+e.id+"\"><input type=\"text\" name=\"cidade\" value=\""+e.cidade+"\"></td><td class=\"r"+e.id+"\"><input type=\"text\" name=\"estado\" value=\""+e.estado+"\"></td><td class=\"r"+e.id+"\"><input type=\"text\" name=\"pais\" value=\""+e.pais+"\"></td> ";
+       			$.each(e.lista_respostas,function(i)
+       			{
+       			row += "<td class=\"r"+e.id+"\"><input type=\"text\" name=\"lista_respostas\" value=\""+e.lista_respostas[i]+"\"></td>";
+       			
+       			});
+       			row += "<td ><button type=\"button\" onclick=\"testeURL("+e.id +")\" class=\"media_button\" value=\""+e.id +"\" >Manage Multimedia</button></td>";
+       		$('#table').append( row );
+       		});
+       	$('#table').append('</tr>');
+       
+       		
+ 			}
+        	
+         });
+	}
+	function testeURL(ide)
+	{
+
+	window.location = "/redirect_media/"+ide;
+
+	}
+	function goEditSurvey(ide)
+	{
+
+	window.location = "/editingSurvey/"+ide;
+
+	}
+	function goEditParameters(ide)
+	{
+
+	window.location = "/editingParameters/"+ide;
+
+	}
+	function launchUpdate(id)
+	{
+	var classs = '.r'+id;
+	var json = "id="+id+";";
+		$(classs).each(function(value){
+			if( typeof $(this).find("input").attr('name') != 'undefined')
+			{
+				json += $(this).find("input").attr('name')+'='+$(this).find("input").val()+";";
+	    	}
+	    	else
+	    	{
+	    		json += $(this).find("textarea").attr('name')+'='+$(this).find("textarea").val()+";";
+	    	}
+		});
+		//CHAMAR O GETJSON 
+		alert(json.replace(/ /g,"_"));
+		
+	
+		
+	$.getJSON('updateoneposto',json.replace(/ /g,"_"), function (value) {
+		alert('Updated response='+value);
+		});
+		
+	}
+	
+ </script>
+ 
+</body>
+</html>
